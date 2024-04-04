@@ -8,14 +8,14 @@ class Player(pygame.sprite.Sprite):
         self.win = pygame.display.get_surface()
 
 
-        self.scale_factor = 3
+        self.scale_factor = 4
         self.animation_index = 0
         self.animation_speed = 0.1
         self.vel = 5
 
         self.animations = {
-            'idle': [pygame.transform.scale((image:=pygame.image.load(f'./assets/characters/player1/idle{i}.png')).convert(), (image.get_width() * self.scale_factor, image.get_height() * self.scale_factor)) for i in range(4)],
-            'run': [pygame.transform.scale((image:=pygame.image.load(f'./assets/characters/player1/run{i}.png')).convert(), (image.get_width() * self.scale_factor, image.get_height() * self.scale_factor)) for i in range(4)]
+            'idle': [pygame.transform.scale((image:=pygame.image.load(f'./assets/characters/player1/idle{i}.png')).convert_alpha(), (image.get_width() * self.scale_factor, image.get_height() * self.scale_factor)) for i in range(4)],
+            'run': [pygame.transform.scale((image:=pygame.image.load(f'./assets/characters/player1/run{i}.png')).convert_alpha(), (image.get_width() * self.scale_factor, image.get_height() * self.scale_factor)) for i in range(4)]
         }
 
 
