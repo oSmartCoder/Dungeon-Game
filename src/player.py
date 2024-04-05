@@ -1,4 +1,7 @@
 import pygame
+from pygame.math import Vector2
+
+
 from math import sqrt
 from random import randint
 
@@ -41,10 +44,8 @@ class Player(pygame.sprite.Sprite):
     def animate(self):
         self.animation_index += self.animation_speed * 0.1 if self.status == 'idle' and int(self.animation_index) == 0 else self.animation_speed
         
-
         if self.animation_index >= len(self.animations[self.status]):
             self.animation_index = 0
-            
         
         image = self.animations[self.status][int(self.animation_index)]
 
@@ -56,38 +57,41 @@ class Player(pygame.sprite.Sprite):
     def movement(self):
         keys = pygame.key.get_pressed()
 
+        self.direction = Vector2()
+
         if not any([keys[control] for control in self.controls.values()]):
             self.status = 'idle' if not self.facing_up else 'idle-up'
 
-        dx, dy = 0, 0
-
         if keys[self.controls['a']]:
             self.facing_right = False
-            self.status = 'run'  
-            dx -= self.vel
+            self.status = 'run' 
+            self.direction.x = -1
         
         if keys[self.controls['d']]:
             self.facing_right = True
             self.status = 'run'
-            dx += self.vel
+            self.direction.x = 1
 
         if keys[self.controls['w']]:
             self.status = 'run-up'
             self.facing_up = True
-            dy -= self.vel
+            self.direction.y = -1
         
         if keys[self.controls['s']]:
             self.status = 'run'
             self.facing_up = False
-            dy += self.vel
+            self.direction.y = 1
+
 
         # Normalise vector movement (so that diagonal movement won't go 41% faster)
         if any([keys[vertical] for vertical in (self.controls['w'], self.controls['s'])]) and any([keys[horizontal] for horizontal in (self.controls['a'], self.controls['d'])]):
-            dx /= sqrt(2)
-            dy /= sqrt(2)
+            self.direction.x /= sqrt(2)
+            self.direction.y /= sqrt(2)
 
-        self.rect.x += dx
-        self.rect.y += dy
+        
+
+        self.rect.x += self.direction.x * self.vel
+        self.rect.y += self.direction.y * self.vel
 
     def update(self):
         self.movement()
