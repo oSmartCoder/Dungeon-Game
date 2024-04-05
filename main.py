@@ -5,6 +5,7 @@ import sys
 from settings import *
 from src import Game
 
+
 class Main:
     def __init__(self):
         pygame.init()
@@ -12,15 +13,12 @@ class Main:
         pygame.display.set_caption('Dungeon Game')
         self.CLOCK = pygame.time.Clock()
 
-
         self.win = pygame.display.set_mode((WIN_X, WIN_Y))
 
         self.game = Game()
-
     
     def update(self):
         self.game.update()
-        
 
     def run(self):
         while True:
@@ -36,7 +34,6 @@ class Main:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-
 
 
 if __name__ == '__main__':
