@@ -3,7 +3,7 @@ from pytmx.util_pygame import load_pygame
 
 from .player import Player
 from .tile import Tile
-from .groups import CameraGroup
+from .groups import CameraGroup, CollisionGroup
 
 from settings import *
 
@@ -15,7 +15,7 @@ class Game:
 
         self.camera_sprites = CameraGroup()
         self.active_sprites = pygame.sprite.Group()
-        self.collision_sprites = pygame.sprite.Group()
+        self.collision_sprites = CollisionGroup()
         self.moveable_sprites = pygame.sprite.Group()
 
         self.load_level()
@@ -41,7 +41,7 @@ class Game:
           
 
         pos = (obj:=tmx_data.get_object_by_name('Spawn Point')).x / tmx_data.tilewidth * TILE_SIZE, obj.y / tmx_data.tileheight * TILE_SIZE
-        
+
         Player(pos, self.camera_sprites, self.active_sprites)
         
 
@@ -50,6 +50,8 @@ class Game:
 
         self.camera_sprites.update()
         self.camera_sprites.custom_draw(self.active_sprites.sprites()[0])
+
+        self.collision_sprites.collision_update(self.active_sprites)
         
 
 
