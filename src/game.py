@@ -26,26 +26,31 @@ class Game:
         tmx_data = load_pygame('./assets/tmx/level_1.tmx')
 
 
+        print(dir(tmx_data))
 
-        for layer in tmx_data.visible_layers:
+        print(tmx_data)
+
+        for i, layer in enumerate(tmx_data.visible_layers):
+
+            
             if isinstance(layer, TiledTileLayer):
-
                 for x, y, surface in layer.tiles():
 
-                    print(tmx_data.get_tile_)
+                    
                     
                     pos = (x * TILE_SIZE, y * TILE_SIZE)
                     image = pygame.transform.scale(surface, (TILE_SIZE, TILE_SIZE))
 
                     # Priority Order
-                    if layer.name == 'Ground' or layer.name == 'Non-Collidable Entities':
-                        Tile(pos, image, self.camera_sprites, layer.name)
+                    match layer.name:
+                        case 'Ground' | 'Bones' | 'Torches' | 'Flags':
+                            Tile(pos, image, self.camera_sprites, layer.name)
+                        
+                        case 'Walls' | 'Chest':
+                            Tile(pos, image, [self.camera_sprites, self.collision_sprites], layer.name)
 
-                    elif layer.name == 'Collidable Entities':
-                        Tile(pos, image, [self.camera_sprites, self.collision_sprites], layer.name)
-
-                    elif layer.name == 'Moveable Entities':
-                        Tile(pos, image, [self.camera_sprites, self.moveable_sprites], layer.name)
+                        case 'Doors':
+                            Tile(pos, image, [self.camera_sprites, self.moveable_sprites], layer.name)
           
 
         pos = (obj:=tmx_data.get_object_by_name('Spawn Point')).x / tmx_data.tilewidth * TILE_SIZE, obj.y / tmx_data.tileheight * TILE_SIZE
