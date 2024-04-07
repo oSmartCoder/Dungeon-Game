@@ -27,7 +27,7 @@ class CameraGroup(pygame.sprite.Group):
 
             self.win.blit(sprite.image, offset_pos)
             
-        self.win.blit(player.animations['shadow'], player.rect.midleft - self.offset + Vector2(4, 20))
+        self.win.blit(player.animations['shadow'], player.rect.midleft - self.offset + Vector2(3, 20))
         
                         
                     
