@@ -11,6 +11,7 @@ class Player(pygame.sprite.Sprite):
 
         # Sprite group setup
         self.collision_sprites = collision_sprites
+        self.camera_group = groups[0]
 
         # General setup
         self.scale_factor = 4
@@ -92,8 +93,17 @@ class Player(pygame.sprite.Sprite):
         self.rect.x += self.direction.x * self.vel
         self.check_collision('horizontal')
         self.rect.y += self.direction.y * self.vel
-        self.check_collision('vertical')
+        self.check_collision('vertical')              
 
+    def sword_mechanics(self):
+        pos = pygame.mouse.get_pos()
+
+
+    def draw_shadow(self, offset):
+        self.win.blit(self.animations['shadow'], self.rect.midleft - offset + Vector2(3, 20))
+
+    def draw_player(self, offset):
+        self.win.blit(self.image, self.rect.topleft - offset)
 
     def check_collision(self, direction):
         for sprite in self.collision_sprites.sprites():
@@ -112,7 +122,10 @@ class Player(pygame.sprite.Sprite):
                     elif self.direction.y < 0:
                         self.rect.top = sprite.rect.bottom
 
-    def update(self):
-        self.win.blit(self.animations['shadow'], self.animations['shadow'].get_rect(midbottom=(self.rect.midbottom)))
+
+    def update(self, offset):
+        self.draw_shadow(offset)
+        self.draw_player(offset)
         self.movement()        
         self.animate()
+        self.sword_mechanics()
