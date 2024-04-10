@@ -20,7 +20,6 @@ class CameraGroup(pygame.sprite.Group):
         self.center_target_camera(player)
 
         for sprite in self.sprites():
-            
             offset_pos = sprite.rect.topleft - self.offset
             
             if sprite != player:
