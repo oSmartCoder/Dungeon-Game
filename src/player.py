@@ -1,6 +1,7 @@
 import pygame
 from pygame.math import Vector2
 
+from math import degrees, atan2
 
 
 class Player(pygame.sprite.Sprite):
@@ -13,11 +14,17 @@ class Player(pygame.sprite.Sprite):
         self.collision_sprites = collision_sprites
         self.camera_group = groups[0]
 
-        # General setup
-        self.scale_factor = 4
-        self.weapon_scale_factor = 3
-        self.animation_index = 0
-        self.animation_speed = 0.15
+        # Player setup
+        self.p_scale_factor = 4
+        self.p_animation_index = 0
+        self.p_animation_speed = 0.15
+
+        # Weapon setup
+        self.w_scale_factor = 4
+        self.w_counter = 0
+        self.w_delay = 20
+
+        # Player controls
         self.vel = 5
         self.controls = {
             'a': pygame.K_a,
@@ -25,40 +32,41 @@ class Player(pygame.sprite.Sprite):
             's': pygame.K_s,
             'w': pygame.K_w
         }
-    
+
         # Load assets
         self.import_assets()
 
-        # Player setup
+        # Player properties
         self.direction = Vector2()
         self.facing_right = True
         self.facing_up = False
         self.status = 'idle'
-        self.image = self.animations[self.status][self.animation_index]
+        self.image = self.p_animations[self.status][self.p_animation_index]
         self.rect = self.image.get_rect(center=pos)
 
-    
-        # Weapon setup
-        self.weapon_rect = self.weapon.get_rect()
+        # Weapon properties
+        self.weapon_image = self.weapons['sword']
+        self.weapon_rect = self.weapon_image.get_rect()
+
 
     def import_assets(self):
-        self.animations = {
-            'idle': [pygame.transform.scale((image:=pygame.image.load(f'./assets/characters/player1/idle{i}.png')).convert_alpha(), (image.get_width() * self.scale_factor, image.get_height() * (self.scale_factor + 0.2))) for i in range(1, 3)],
-            'run': [pygame.transform.scale((image:=pygame.image.load(f'./assets/characters/player1/run{i}.png')).convert_alpha(), (image.get_width() * self.scale_factor, image.get_height() * (self.scale_factor + 0.2))) for i in range(1, 5)],
-            'idle-up': [pygame.transform.scale((image:=pygame.image.load(f'./assets/characters/player1/idle-up{i}.png')).convert_alpha(), (image.get_width() * self.scale_factor, image.get_height() * (self.scale_factor + 0.2))) for i in range(1, 4)],
-            'run-up': [pygame.transform.scale((image:=pygame.image.load(f'./assets/characters/player1/run-up{i}.png')).convert_alpha(), (image.get_width() * self.scale_factor, image.get_height() * (self.scale_factor + 0.2))) for i in range(1, 4)],
-            'shadow': pygame.transform.scale((image:=pygame.image.load(f'./assets/characters/shadow.png').convert_alpha()), (image.get_width() * self.scale_factor, image.get_height() * self.scale_factor))
+        self.p_animations = {
+            'idle': [pygame.transform.scale((image:=pygame.image.load(f'./assets/characters/player1/idle{i}.png')).convert_alpha(), (image.get_width() * self.p_scale_factor, image.get_height() * (self.p_scale_factor + 0.2))) for i in range(1, 3)],
+            'run': [pygame.transform.scale((image:=pygame.image.load(f'./assets/characters/player1/run{i}.png')).convert_alpha(), (image.get_width() * self.p_scale_factor, image.get_height() * (self.p_scale_factor + 0.2))) for i in range(1, 5)],
+            'shadow': pygame.transform.scale((image:=pygame.image.load(f'./assets/characters/shadow.png').convert_alpha()), (image.get_width() * self.p_scale_factor, image.get_height() * self.p_scale_factor))
         }
-        
-        self.weapon = pygame.transform.scale((image:=pygame.image.load('./assets/weapons/wooden/wooden_sword.png')), (image.get_width() * self.weapon_scale_factor, image.get_height() * self.weapon_scale_factor)).convert_alpha()
+
+        self.weapons = {
+            'sword': pygame.transform.rotate(pygame.transform.scale((image:=pygame.image.load(f'./assets/weapons/stone/stone_sword_2.png').convert_alpha()), (image.get_width() * self.w_scale_factor, image.get_height() * self.w_scale_factor)), -45)
+        }
 
     def animate(self):
-        self.animation_index += self.animation_speed * 0.1 if self.status == 'idle' and int(self.animation_index) == 0 else self.animation_speed
+        self.p_animation_index += self.p_animation_speed * 0.1 if self.status == 'idle' and int(self.p_animation_index) == 0 else self.p_animation_speed
         
-        if self.animation_index >= len(self.animations[self.status]):
-            self.animation_index = 0
+        if self.p_animation_index >= len(self.p_animations[self.status]):
+            self.p_animation_index = 0
         
-        image = self.animations[self.status][int(self.animation_index)]
+        image = self.p_animations[self.status][int(self.p_animation_index)]
 
         if self.facing_right:
             self.image = image
@@ -69,26 +77,23 @@ class Player(pygame.sprite.Sprite):
         keys = pygame.key.get_pressed()
 
         if not any([keys[control] for control in self.controls.values()]):
-            self.status = 'idle' if not self.facing_up else 'idle-up'
+            self.status = 'idle'
+        
+        else:
+            self.status = 'run'
         
         if keys[self.controls['d']]:
             self.facing_right = True
-            self.status = 'run'
             self.direction.x = 1
         elif keys[self.controls['a']]:
             self.facing_right = False
-            self.status = 'run' 
             self.direction.x = -1
         else:
             self.direction.x = 0
 
         if keys[self.controls['s']]:
-            self.status = 'run'
-            self.facing_up = False
             self.direction.y = 1
         elif keys[self.controls['w']]:
-            self.status = 'run-up'
-            self.facing_up = True
             self.direction.y = -1
         else:
             self.direction.y = 0
@@ -103,7 +108,7 @@ class Player(pygame.sprite.Sprite):
         self.check_collision('vertical')              
 
     def draw_shadow(self, offset):
-        self.win.blit(self.animations['shadow'], self.rect.midleft - offset + Vector2(3, 20))
+        self.win.blit(self.p_animations['shadow'], self.rect.midleft - offset + Vector2(3, 20))
 
     def draw_player(self, offset):
         self.win.blit(self.image, self.rect.topleft - offset)
@@ -123,17 +128,42 @@ class Player(pygame.sprite.Sprite):
                         self.rect.bottom = sprite.rect.top
 
                     elif self.direction.y < 0:
-                        self.rect.top = sprite.rect.bottom
+                        self.rect.top = sprite.rect.bottom   
 
-    def sword_mechanics(self):
-        pos = pygame.mouse.get_pos()
+    def rotate_on_pivot(self, image, angle, pivot, origin):
+    
+        surf = pygame.transform.rotate(image, angle)
 
-        self.win.blit(self.weapon, pos - Vector2(self.weapon_rect.centerx, self.weapon_rect.centery))
+        offset = pivot + (origin - pivot).rotate(-angle)
+        rect = surf.get_rect(center = offset)
+
+        return surf, rect
+
+    def sword_mechanics(self, offset):
+        origin = Vector2(self.rect.center - offset)
+        pos = Vector2(pygame.mouse.get_pos())
+
+        weapon_pos = origin + (60, 0)
+
+        image = self.weapon_image
+        mouse_offset = pos - origin
+        angle = -degrees(atan2(mouse_offset.y, mouse_offset.x))
+        image, self.weapon_rect = self.rotate_on_pivot(image, angle, origin, weapon_pos)
+
+        self.win.blit(image, self.weapon_rect)
+
+        
 
 
-    def update(self, offset):
-        self.draw_shadow(offset)
-        self.draw_player(offset)
+    def update(self, offset: Vector2):
+        if self.weapon_rect.centery < self.rect.centery - offset.y:
+            self.sword_mechanics(offset)
+            self.draw_shadow(offset)
+            self.draw_player(offset)
+        else:
+            self.draw_shadow(offset)
+            self.draw_player(offset)
+            self.sword_mechanics(offset)
         self.movement()        
         self.animate()
-        self.sword_mechanics()
+        
