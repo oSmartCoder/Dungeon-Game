@@ -44,10 +44,10 @@ class Chest(AnimatedTile):
 
         match layer_name:
             case 'Chest':
-                self.animations = [pygame.image.load(f'./assets/sprite animations/chest/chest_{i}.png') for i in range(1, 5)]
+                self.animations = [pygame.image.load(f'./assets/sprite animations/chest/chest_{i}.png').convert_alpha() for i in range(1, 5)]
             
             case 'Mini Chest':
-                self.animations = [pygame.image.load(f'./assets/sprite animations/mini_chest/mini_chest_{i}.png') for i in range(1, 5)]
+                self.animations = [pygame.image.load(f'./assets/sprite animations/mini_chest/mini_chest_{i}.png').convert_alpha() for i in range(1, 5)]
             
             case _:
                 raise ValueError(f'Cannot assign layer \'{layer_name}\' to {__class__.__name__}.animations')
@@ -81,16 +81,16 @@ class Flask(AnimatedTile):
 
         match layer_name:
             case 'Small Blue Flask':
-                self.animations = [pygame.image.load(f'./assets/sprite animations/flasks/small_blue_flask_{i}.png') for i in range(1, 5)]
+                self.animations = [pygame.image.load(f'./assets/sprite animations/flasks/small_blue_flask_{i}.png').convert_alpha() for i in range(1, 5)]
             
             case 'Small Red Flask':
-                self.animations = [pygame.image.load(f'./assets/sprite animations/flasks/small_red_flask_{i}.png') for i in range(1, 5)]
+                self.animations = [pygame.image.load(f'./assets/sprite animations/flasks/small_red_flask_{i}.png').convert_alpha() for i in range(1, 5)]
 
             case 'Large Blue Flask':
-                self.animations = [pygame.image.load(f'./assets/sprite animations/flasks/large_blue_flask_{i}.png') for i in range(1, 5)]
+                self.animations = [pygame.image.load(f'./assets/sprite animations/flasks/large_blue_flask_{i}.png').convert_alpha() for i in range(1, 5)]
             
             case 'Large Red Flask':
-                self.animations = [pygame.image.load(f'./assets/sprite animations/flasks/large_red_flask_{i}.png') for i in range(1, 5)]
+                self.animations = [pygame.image.load(f'./assets/sprite animations/flasks/large_red_flask_{i}.png').convert_alpha() for i in range(1, 5)]
 
             case _:
                 raise ValueError(f'Cannot assign layer \'{layer_name}\' to {__class__.__name__}.animations')
@@ -107,10 +107,10 @@ class Key(AnimatedTile):
 
         match layer_name:
             case 'Golden Key':
-                self.animations = [pygame.image.load(f'./assets/sprite animations/keys/golden_key_{i}.png') for i in range(1, 5)]
+                self.animations = [pygame.image.load(f'./assets/sprite animations/keys/golden_key_{i}.png').convert_alpha() for i in range(1, 5)]
             
             case 'Silver Key':
-                self.animations = [pygame.image.load(f'./assets/sprite animations/keys/silver_key_{i}.png') for i in range(1, 5)]
+                self.animations = [pygame.image.load(f'./assets/sprite animations/keys/silver_key_{i}.png').convert_alpha() for i in range(1, 5)]
 
             case _:
                 raise ValueError(f'Cannot assign layer \'{layer_name}\' to {__class__.__name__}.animations')
@@ -127,19 +127,19 @@ class Torch(AnimatedTile):
 
         match layer_name:
             case 'Front Torch':
-                self.animations = [pygame.image.load(f'./assets/sprite animations/torch/front_torch_{i}.png') for i in range(1, 5)]
+                self.animations = [pygame.image.load(f'./assets/sprite animations/torch/front_torch_{i}.png').convert_alpha() for i in range(1, 5)]
             
             case 'Left Torch':
-                self.animations = [pygame.image.load(f'./assets/sprite animations/torch/side_torch_{i}.png') for i in range(1, 5)]
+                self.animations = [pygame.image.load(f'./assets/sprite animations/torch/side_torch_{i}.png').convert_alpha() for i in range(1, 5)]
 
             case 'Right Torch':
-                self.animations = [pygame.transform.flip(pygame.image.load(f'./assets/sprite animations/torch/side_torch_{i}.png'), True, False) for i in range(1, 5)]
+                self.animations = [pygame.transform.flip(pygame.image.load(f'./assets/sprite animations/torch/side_torch_{i}.png').convert_alpha(), True, False) for i in range(1, 5)]
 
             case 'Small Candlestick':
-                self.animations = [pygame.image.load(f'./assets/sprite animations/torch/small_candlestick_{i}.png') for i in range(1, 5)]
+                self.animations = [pygame.image.load(f'./assets/sprite animations/torch/small_candlestick_{i}.png').convert_alpha() for i in range(1, 5)]
 
             case 'Tall Candlestick':
-                self.animations = [pygame.image.load(f'./assets/sprite animations/torch/tall_candlestick_{i}.png') for i in range(1, 5)]
+                self.animations = [pygame.image.load(f'./assets/sprite animations/torch/tall_candlestick_{i}.png').convert_alpha() for i in range(1, 5)]
 
             case _:
                 raise ValueError(f'Cannot assign layer \'{layer_name}\' to {__class__.__name__}.animations')
@@ -156,7 +156,7 @@ class Flag(AnimatedTile):
 
         match layer_name:
             case 'Flag':
-                self.animations = [pygame.image.load(f'./assets/sprite animations/flag/flag_{i}.png') for i in range(1, 5)]
+                self.animations = [pygame.image.load(f'./assets/sprite animations/flag/flag_{i}.png').convert_alpha() for i in range(1, 5)]
 
             case _:
                 raise ValueError(f'Cannot assign layer \'{layer_name}\' to {__class__.__name__}.animations')
@@ -172,34 +172,18 @@ class Box(AnimatedTile):
     
         match layer_name:
             case 'Mini Silver Box':
-                self.animations = [pygame.image.load(f'./assets/sprite animations/mini_silver_box/mini_silver_box_{i}.png') for i in range(1, 5)]
+                self.animations = [pygame.image.load(f'./assets/sprite animations/mini_silver_box/mini_silver_box_{i}.png').convert_alpha() for i in range(1, 5)]
 
             case 'Mini Brown Box':
-                self.animations = [pygame.image.load(f'./assets/sprite animations/mini_brown_box/mini_brown_box_{i}.png') for i in range(1, 5)]
+                self.animations = [pygame.image.load(f'./assets/sprite animations/mini_brown_box/mini_brown_box_{i}.png').convert_alpha() for i in range(1, 5)]
 
             case 'Silver Box':
-                self.animations = [pygame.image.load(f'./assets/sprite animations/silver_box/silver_box_{i}.png') for i in range(1, 5)]
+                self.animations = [pygame.image.load(f'./assets/sprite animations/silver_box/silver_box_{i}.png').convert_alpha() for i in range(1, 5)]
 
             case 'Brown Box':
-                self.animations = [pygame.image.load(f'./assets/sprite animations/brown_box/brown_box_{i}.png') for i in range(1, 5)]
+                self.animations = [pygame.image.load(f'./assets/sprite animations/brown_box/brown_box_{i}.png').convert_alpha() for i in range(1, 5)]
 
             case _:
                 raise ValueError(f'Cannot assign layer \'{layer_name}\' to {__class__.__name__}.animations')
         
         self.animations = [pygame.transform.scale(image, (TILE_SIZE, TILE_SIZE)) for image in self.animations]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-

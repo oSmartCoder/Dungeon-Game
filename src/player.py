@@ -15,6 +15,7 @@ class Player(pygame.sprite.Sprite):
 
         # General setup
         self.scale_factor = 4
+        self.weapon_scale_factor = 3
         self.animation_index = 0
         self.animation_speed = 0.15
         self.vel = 5
@@ -36,6 +37,10 @@ class Player(pygame.sprite.Sprite):
         self.image = self.animations[self.status][self.animation_index]
         self.rect = self.image.get_rect(center=pos)
 
+    
+        # Weapon setup
+        self.weapon_rect = self.weapon.get_rect()
+
     def import_assets(self):
         self.animations = {
             'idle': [pygame.transform.scale((image:=pygame.image.load(f'./assets/characters/player1/idle{i}.png')).convert_alpha(), (image.get_width() * self.scale_factor, image.get_height() * (self.scale_factor + 0.2))) for i in range(1, 3)],
@@ -44,6 +49,8 @@ class Player(pygame.sprite.Sprite):
             'run-up': [pygame.transform.scale((image:=pygame.image.load(f'./assets/characters/player1/run-up{i}.png')).convert_alpha(), (image.get_width() * self.scale_factor, image.get_height() * (self.scale_factor + 0.2))) for i in range(1, 4)],
             'shadow': pygame.transform.scale((image:=pygame.image.load(f'./assets/characters/shadow.png').convert_alpha()), (image.get_width() * self.scale_factor, image.get_height() * self.scale_factor))
         }
+        
+        self.weapon = pygame.transform.scale((image:=pygame.image.load('./assets/weapons/wooden/wooden_sword.png')), (image.get_width() * self.weapon_scale_factor, image.get_height() * self.weapon_scale_factor)).convert_alpha()
 
     def animate(self):
         self.animation_index += self.animation_speed * 0.1 if self.status == 'idle' and int(self.animation_index) == 0 else self.animation_speed
@@ -95,10 +102,6 @@ class Player(pygame.sprite.Sprite):
         self.rect.y += self.direction.y * self.vel
         self.check_collision('vertical')              
 
-    def sword_mechanics(self):
-        pos = pygame.mouse.get_pos()
-
-
     def draw_shadow(self, offset):
         self.win.blit(self.animations['shadow'], self.rect.midleft - offset + Vector2(3, 20))
 
@@ -121,6 +124,11 @@ class Player(pygame.sprite.Sprite):
 
                     elif self.direction.y < 0:
                         self.rect.top = sprite.rect.bottom
+
+    def sword_mechanics(self):
+        pos = pygame.mouse.get_pos()
+
+        self.win.blit(self.weapon, pos - Vector2(self.weapon_rect.centerx, self.weapon_rect.centery))
 
 
     def update(self, offset):
