@@ -4,7 +4,8 @@ from pytmx.util_pygame import load_pygame
 
 from .player import Player
 from .tile import *
-from .groups import CameraGroup, AnimationGroup, InteractiveGroup
+from .groups import CollisionGroup, CameraGroup, AnimationGroup, InteractiveGroup
+from .enemy import Enemy
 from settings import *
 
 
@@ -12,9 +13,11 @@ class Game:
     def __init__(self):
         self.win = pygame.display.get_surface()
 
-        
-        self.active_sprites = pygame.sprite.Group()
-        self.collision_sprites = pygame.sprite.Group()
+        self.collision_sprites = CollisionGroup()
+
+        self.enemy_sprites = pygame.sprite.Group()
+        self.player_sprite = pygame.sprite.GroupSingle()
+        self.active_sprites = pygame.sprite.Group() # enemy sprites + player sprite
 
         self.camera_sprites = CameraGroup()
         self.interactive_sprites = InteractiveGroup()
@@ -68,17 +71,32 @@ class Game:
                         case _:
                             raise ValueError(f'Cannot assign layer \'{layer.name}\' to associated class')
 
-        spawn_point_pos = (obj:=tmx_data.get_object_by_name('Spawn Point')).x / tmx_data.tilewidth * TILE_SIZE, obj.y / tmx_data.tileheight * TILE_SIZE
+        for obj in tmx_data.objects:
+            pos = (obj.x / tmx_data.tilewidth * TILE_SIZE, obj.y / tmx_data.tileheight * TILE_SIZE)
+            match obj.name:
+                case 'Spawn Point':
+                    Player(pos, [self.camera_sprites, self.active_sprites, self.player_sprite], self.collision_sprites)
 
-        Player(spawn_point_pos, [self.camera_sprites, self.active_sprites], self.collision_sprites)
-        
+                case _:
+                    Enemy(pos, [self.camera_sprites, self.animation_sprites, self.active_sprites, self.enemy_sprites], obj.name)
 
     def update(self):
         self.win.fill((37, 19, 26))
+        
+        self.collision_sprites.update_active_sprites_position(self.active_sprites)
 
         self.animation_sprites.animate()
-    
-        self.camera_sprites.custom_update(self.active_sprites.sprites()[0])
+
+        self.enemy_sprites.update(self.player_sprite.sprite)
+
+        self.camera_sprites.draw_sprites(self.player_sprite.sprite)
+        
+        self.camera_sprites.update_player(self.player_sprite.sprite)
+
+        
+
+
+
 
         
 
