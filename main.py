@@ -22,8 +22,6 @@ class Main:
 
     def run(self):
         while True:
-
-
             self.update()
 
             pygame.display.update()
