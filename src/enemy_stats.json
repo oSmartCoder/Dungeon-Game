@@ -3,20 +3,23 @@
         "health": 50,
         "damage": 5,
         "attack radius": 50,
-        "pursue radius": 500
+        "pursue radius": 500,
+        "knockback": 12
     },
 
     "red 2": {
         "health": 100,
         "damage": 15,
         "attack radius": 60,
-        "pursue radius": 600
+        "pursue radius": 600,
+        "knockback": 9
     },
 
     "red 3": {
         "health": 150,
         "damage": 20,
         "attack radius": 65,
-        "pursue radius": 700
+        "pursue radius": 700,
+        "knockback": 8
     }
 }
