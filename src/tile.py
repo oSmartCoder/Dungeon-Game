@@ -1,12 +1,10 @@
 import pygame
 
-from typing import Tuple, List
-
 from settings import *
 
 
 class Tile(pygame.sprite.Sprite):
-    def __init__(self, pos: Tuple[int, int], surface: pygame.Surface, groups: List[pygame.sprite.Group], layer_name: str) -> None:
+    def __init__(self, pos: tuple[int, int], surface: pygame.Surface, groups: list[pygame.sprite.Group], layer_name: str) -> None:
         super().__init__(groups)
 
         self.image = surface
@@ -21,6 +19,7 @@ class AnimatedTile(Tile):
 
 # Non-animated tiles
 
+
 class Door(Tile):
     def __init__(self, pos, surface, groups, layer_name):
         super().__init__(pos, surface, groups, layer_name)
@@ -29,7 +28,6 @@ class Door(Tile):
 class Ladder(Tile):
     def __init__(self, pos, surface, groups, layer_name):
         super().__init__(pos, surface, groups, layer_name)
-
 
 
 # Animated Tiles
