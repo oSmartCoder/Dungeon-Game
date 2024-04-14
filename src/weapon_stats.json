@@ -1,9 +1,0 @@
-{
-    "stone": {
-        "sword": {
-            "damage": 15,
-            "attack radius": 70,
-            "cooldown": 1
-        }
-    }
-}
