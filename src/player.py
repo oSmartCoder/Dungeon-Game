@@ -1,7 +1,11 @@
 import pygame
 from pygame.math import Vector2
+from pygame.mixer import Sound
 
+import json
 from math import degrees, atan2
+
+from settings import *
 
 
 class Player(pygame.sprite.Sprite):
@@ -19,6 +23,9 @@ class Player(pygame.sprite.Sprite):
         self.p_animation_speed = 0.15
         self.delta = Vector2()
 
+        # Import player and weapon data
+        self.import_data()
+
         # Weapon setup
         self.w_scale_factor = 3.5
         self.w_animation_counter = 0
@@ -30,6 +37,13 @@ class Player(pygame.sprite.Sprite):
         self.origin, self.pos = Vector2(), Vector2()
         self.clicked = False
         self.disable_controls = False
+        
+        # Weapon stats
+        self.damage = self.weapon_data['stone']['sword']['damage']
+
+        # Player stats
+        self.initial_health = self.player_data['health']
+        self.health = self.player_data['health'] - 5
 
         # Player controls
         self.vel = 5
@@ -41,8 +55,8 @@ class Player(pygame.sprite.Sprite):
         }
 
         # Load assets
-        self.import_assets()
-
+        self.import_images()
+        
         # Player properties
         self.direction = Vector2()
         self.facing_right = True
@@ -55,7 +69,24 @@ class Player(pygame.sprite.Sprite):
         self.weapon_image = self.weapons['sword']
         self.particle_images = self.weapons['sword-particles']
 
-    def import_assets(self):
+    
+        # Health Bar
+        self.hb_scale_factor = 3
+        self.hb_image = pygame.transform.scale((image:=pygame.image.load('./assets/gui/health bar/health_bar.png').convert_alpha()), (image.get_width() * self.hb_scale_factor, image.get_height() * self.hb_scale_factor))
+        self.hb_template_rect = self.hb_image.get_rect(topleft=(20, 20))
+        
+        self.health_bar_rect = pygame.Rect(*(self.hb_template_rect.topleft + Vector2(3, 3) * self.hb_scale_factor), self.hb_template_rect.width * 12 / 13, self.hb_template_rect.height * 5 / 8)
+        self.health_rect = self.health_bar_rect.copy()
+
+        # Load Sounds
+        self.import_sounds()
+    
+    def display_text(self, text: str, pos: tuple[int, int], font_size: int=30, colour: str='white'):
+        font = pygame.font.Font('./assets/fonts/font.ttf', font_size)
+        image = font.render(text, True, colour)
+        self.win.blit(image, image.get_rect(center=pos).topleft + Vector2(0, 4))
+
+    def import_images(self):
         self.p_animations = {
             'idle': [pygame.transform.scale((image:=pygame.image.load(f'./assets/characters/player1/idle_{i}.png')).convert_alpha(), (image.get_width() * self.p_scale_factor, image.get_height() * (self.p_scale_factor + 0.2))) for i in range(1, 3)],
             'idle-up': [pygame.transform.scale((image:=pygame.image.load(f'./assets/characters/player1/idle_up_{i}.png')).convert_alpha(), (image.get_width() * self.p_scale_factor, image.get_height() * (self.p_scale_factor + 0.2))) for i in range(1, 2)],
@@ -69,6 +100,20 @@ class Player(pygame.sprite.Sprite):
             'sword': pygame.transform.rotate(pygame.transform.scale((image:=pygame.image.load(f'./assets/weapons/stone/stone_sword_2.png').convert_alpha()), (image.get_width() * self.w_scale_factor, image.get_height() * self.w_scale_factor)), -45), # 45 degrees offset
             'sword-particles': [pygame.transform.scale((image:=pygame.image.load(f'./assets/weapons/sword_particles_{i}.png')), (image.get_width() * self.w_scale_factor, image.get_height() * self.w_scale_factor)) for i in range(1, 3)] # -90 degrees offset
         }
+
+    def import_sounds(self):
+        self.sword_sound = Sound('./assets/sounds/items/sword.wav')
+        self.player_hurt_sound = Sound('./assets/sounds/player/player_hurt.wav')
+        self.player_roll_sound = Sound('./assets/sounds/player/player_roll.wav')
+
+    def import_data(self):
+        # Import weapon data
+        with open('./data/weapon_data.json') as rf:
+            self.weapon_data = json.load(rf)
+
+        # Import player data
+        with open('./data/player_data.json') as rf:
+            self.player_data = json.load(rf)      
 
     def animate(self):
         self.p_animation_index += self.p_animation_speed * 0.1 if self.status == 'idle' and int(self.p_animation_index) == 0 else self.p_animation_speed
@@ -89,6 +134,8 @@ class Player(pygame.sprite.Sprite):
             self.image = image
         else:
             self.image = pygame.transform.flip(image, True, False)
+
+        self.mask = pygame.mask.from_surface(self.image)
 
     def user_input(self):
 
@@ -147,9 +194,6 @@ class Player(pygame.sprite.Sprite):
 
         self.delta += self.direction * self.vel         
 
-    def draw_shadow(self, offset):
-        self.win.blit(self.p_animations['shadow'], self.rect.midleft - offset + Vector2(3, 20))
-
     def draw_player(self, offset):
         self.win.blit(self.image, self.rect.topleft - offset)
 
@@ -193,7 +237,7 @@ class Player(pygame.sprite.Sprite):
     def draw_sword_particles(self, angle: float):
             particle_image = pygame.transform.flip(self.particle_images[round(self.w_animation_counter / self.w_animation_period)], True, False) if self.sword_direction == 1 else pygame.transform.flip(self.particle_images[round(self.w_animation_counter / self.w_animation_period)], True, True)
             particle_image, self.particle_rect = self.rotate_on_pivot(particle_image, angle, self.origin, Vector2(48, -15 if self.sword_direction == 1 else 15))
-            # particle_mask = pygame.mask.from_surface(particle_mask)
+            self.particle_mask = pygame.mask.from_surface(particle_image)
 
             self.win.blit(particle_image, self.particle_rect)
 
@@ -208,6 +252,7 @@ class Player(pygame.sprite.Sprite):
                     self.disable_controls = True
                     self.origin = Vector2(self.rect.center - offset)
                     self.pos = Vector2(pygame.mouse.get_pos())
+                    self.sword_sound.play()
             
             if not pygame.mouse.get_pressed()[0]:
                 self.clicked = False
@@ -234,9 +279,28 @@ class Player(pygame.sprite.Sprite):
         else:
             self.w_delay_counter += 0.1
 
+    def update_health_bar(self):
+        self.health_rect = self.health_bar_rect.copy()
+        health_percentage = self.health / self.initial_health
+        self.health_rect.width = self.health_bar_rect.width * health_percentage
+
+        if health_percentage >= 0.6:
+            colour = COLOURS['green'] 
+        elif health_percentage >= 0.3:
+            colour = COLOURS['orange']
+        else:
+            colour = COLOURS['red']
+
+        self.win.blit(self.hb_image, self.hb_template_rect)
+        pygame.draw.rect(self.win, 'black', self.health_bar_rect)        
+        pygame.draw.rect(self.win, colour, self.health_rect)
+        # self.display_text(f'{self.health}/{self.initial_health}', self.health_rect.center)
+
+
     def update(self, offset: Vector2):
         self.sword_mechanics(offset) # self.sword_mechanics() should be ran before self.user_input() so that self.direction and self.delta values are more accurate (a change of values by one tick/frame could cause some issues/bugs with collision detection)
         self.user_input()
         self.animate()
         self.draw_player(offset)
+        self.update_health_bar()
         
