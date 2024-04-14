@@ -1,6 +1,7 @@
 import pygame
 from pygame.math import Vector2
 from pygame.sprite import Sprite, Group
+from pygame.mixer import Sound
 
 from random import randint
 
@@ -59,26 +60,27 @@ class CameraGroup(Group):
 
         self.shadow_image = pygame.image.load(f'./assets/characters/shadow.png').convert_alpha()
 
-        self.sc_amount = 2
+        self.sc_amount = 7
 
     def center_target_camera(self, target: Sprite):
         self.offset.x = target.rect.centerx - WIN_X / 2
         self.offset.y = target.rect.centery - WIN_Y / 2
     
     def shake_camera(self):
-        self.offset += (randint(-self.sc_amount, self.sc_amount), randint(-self.sc_amount, self.sc_amount))
+        self.offset.x += randint(-self.sc_amount, self.sc_amount)
 
     def draw_sprites(self, player: Sprite, active_sprites: Group):
-
         for sprite in self.sprites():
             offset_pos = sprite.rect.topleft - self.offset
-
             if sprite in active_sprites:
-                self.win.blit(pygame.transform.scale(self.shadow_image, (sprite.rect.width, sprite.rect.height // 3.5)), (sprite.rect.bottomleft - self.offset - Vector2(0, 10)))
+                self.win.blit(pygame.transform.scale(self.shadow_image, (sprite.rect.width if sprite is player else sprite.rect.width / 1.8, sprite.rect.height / 3.5)), (sprite.rect.bottomleft - self.offset + Vector2(2 if sprite is player else 15, -10)))
             
-            
-            if sprite is not player:
+            else:
                 self.win.blit(sprite.image, offset_pos)
+    
+    def update_enemies(self, player: Sprite, enemy_sprites: Group):
+        for sprite in enemy_sprites:
+            sprite.update(player, self.offset)
     
     def update_player(self, player: Sprite):
         player.update(self.offset)
@@ -113,29 +115,33 @@ class InteractiveGroup(Group):
         pass
 
 
+class ActiveGroup(Group):
+    def __init__(self):
+        super().__init__()
 
-            
-        
-        
-                        
-                    
-                        
+        self.win = pygame.display.get_surface()
 
-
-            
-
-
-
+        self.enemy_hurt_sound = Sound('./assets/sounds/enemies/enemy_hurt.wav')
+        self.enemy_die_sound = Sound('./assets/sounds/enemies/enemy_die.wav')
     
-
+    def check_collision_between_sprites(self, camera_sprites: Group):
+        player = self.sprites()[0]
+        enemy_sprites = self.sprites()[1:]
         
+        for enemy_sprite in enemy_sprites:
+            if player.triggered:
+                particle_rect_offset = pygame.Rect(*(player.particle_rect.topleft + camera_sprites.offset), *player.particle_rect.size)
+                if enemy_sprite.rect.colliderect(particle_rect_offset):
+                    if enemy_sprite.health <= 0:
+                        enemy_sprite.kill()
+                        self.enemy_die_sound.play()
 
+                    elif not enemy_sprite.disable_pursue:
+                        enemy_sprite.health -= player.damage
+                        self.enemy_hurt_sound.play()                        
+                        enemy_sprite.disable_pursue = True
 
-
-    
-
-
-
-
-
-
+                    else:
+                        enemy_sprite.delta = player.origin.move_towards(player.pos, enemy_sprite.knockback) - player.origin
+                        enemy_sprite.update_direction(inverse_facing_right=True)
+                        camera_sprites.shake_camera()
