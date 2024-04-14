@@ -1,12 +1,12 @@
 import pygame
+from pygame.mixer import Sound
 from pytmx import TiledTileLayer
 from pytmx.util_pygame import load_pygame
 
 from .player import Player
 from .tile import *
-from .groups import CollisionGroup, CameraGroup, AnimationGroup, InteractiveGroup
+from .groups import CollisionGroup, CameraGroup, AnimationGroup, InteractiveGroup, ActiveGroup
 from .enemy import Enemy
-from .health_bar import HealthBar
 from settings import *
 
 
@@ -18,7 +18,7 @@ class Game:
 
         self.enemy_sprites = pygame.sprite.Group()
         self.player = pygame.sprite.GroupSingle()
-        self.active_sprites = pygame.sprite.Group() # enemy sprites + player sprite
+        self.active_sprites = ActiveGroup() # enemy sprites + player sprite
 
         self.camera_sprites = CameraGroup()
         self.interactive_sprites = InteractiveGroup()
@@ -26,8 +26,9 @@ class Game:
 
         self.load_level()
 
-        self.health_bar = HealthBar((20, 20), 100)
-
+        self.music = Sound('./assets/sounds/music/mountain trials.mp3')
+        self.music.set_volume(0.05)
+        self.music.play(loops=-1)
 
     def load_level(self):
         tmx_data = load_pygame('./assets/tmx/level_1.tmx')
@@ -83,36 +84,24 @@ class Game:
 
                 case _:
                     Enemy(pos, [self.camera_sprites, self.animation_sprites, self.active_sprites, self.enemy_sprites], obj.name)
-
-    def check_collision_between_active_sprites(self):
-        for enemy_sprite in self.enemy_sprites:
-            if self.player.sprite.triggered:
-                particle_rect_offset = pygame.Rect(*(self.player.sprite.particle_rect.topleft + self.camera_sprites.offset), *self.player.sprite.particle_rect.size)
-                if enemy_sprite.rect.colliderect(particle_rect_offset):
-                    enemy_sprite.disable_persue = True
-                    enemy_sprite.delta = self.player.sprite.origin.move_towards(self.player.sprite.pos, enemy_sprite.data['knockback']) - self.player.sprite.origin
-
-                    enemy_sprite.update_direction()
-                    self.camera_sprites.shake_camera()
                 
-                else:
-                    enemy_sprite.triggered_delay = True
-
     def update(self):
-        self.win.fill((37, 19, 26))
+        self.win.fill(COLOURS['background'])
         
         self.collision_sprites.update_active_sprites_position(self.active_sprites, self.player.sprite)
 
-        self.enemy_sprites.update(self.player.sprite)
+        self.camera_sprites.draw_sprites(self.player.sprite, self.active_sprites)
+        
+        self.camera_sprites.update_enemies(self.player.sprite, self.enemy_sprites)
 
         self.camera_sprites.center_target_camera(self.player.sprite)
-        self.check_collision_between_active_sprites()
-        self.camera_sprites.draw_sprites(self.player.sprite, self.active_sprites)
+
+        self.active_sprites.check_collision_between_sprites(self.camera_sprites)
+        
         self.camera_sprites.update_player(self.player.sprite)
 
         self.animation_sprites.animate()
 
-        self.health_bar.update()
 
         
 
