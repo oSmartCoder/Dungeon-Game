@@ -1,0 +1,25 @@
+{
+    "red 1": {
+        "health": 20,
+        "damage": 3,
+        "attack radius": 50,
+        "pursue radius": 500,
+        "knockback": 13
+    },
+
+    "red 2": {
+        "health": 40,
+        "damage": 6,
+        "attack radius": 60,
+        "pursue radius": 600,
+        "knockback": 9
+    },
+
+    "red 3": {
+        "health": 80,
+        "damage": 10,
+        "attack radius": 65,
+        "pursue radius": 700,
+        "knockback": 8
+    }
+}
