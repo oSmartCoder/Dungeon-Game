@@ -26,9 +26,9 @@ class Game:
 
         self.load_level()
 
-        self.music = Sound('./assets/sounds/music/mountain trials.mp3')
-        self.music.set_volume(0.05)
-        self.music.play(loops=-1)
+        # self.music = Sound('./assets/sounds/music/mountain trials.mp3')
+        # self.music.set_volume(0.05)
+        # self.music.play(loops=-1)
 
     def load_level(self):
         tmx_data = load_pygame('./assets/tmx/level_1.tmx')
