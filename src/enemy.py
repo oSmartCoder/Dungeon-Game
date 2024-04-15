@@ -139,7 +139,3 @@ class Enemy(pygame.sprite.Sprite):
         self.update_image()
         self.update_health_bar(offset)
         self.draw_enemy(offset)
-
-
-
-    
