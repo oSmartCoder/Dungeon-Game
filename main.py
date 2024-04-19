@@ -16,22 +16,28 @@ class Main:
         self.win = pygame.display.set_mode((WIN_X, WIN_Y))
 
         self.game = Game()
-    
+
     def update(self):
         self.game.update()
 
     def run(self):
         while True:
+            self.win.fill(COLOURS['background'])
+            
             self.update()
 
-            pygame.display.update()
-
             self.CLOCK.tick(FPS)
+
+            pygame.display.update()
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
+
+
+            
+            
 
 
 if __name__ == '__main__':
