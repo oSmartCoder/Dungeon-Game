@@ -85,9 +85,7 @@ class Game:
                 case _:
                     Enemy(pos, [self.camera_sprites, self.animation_sprites, self.active_sprites, self.enemy_sprites], obj.name)
                 
-    def update(self):
-        self.win.fill(COLOURS['background'])
-        
+    def update(self):        
         self.collision_sprites.update_active_sprites_position(self.active_sprites, self.player.sprite)
 
         self.camera_sprites.draw_sprites(self.player.sprite, self.active_sprites)
@@ -101,7 +99,6 @@ class Game:
         self.camera_sprites.update_player(self.player.sprite)
 
         self.animation_sprites.animate()
-
 
         
 
