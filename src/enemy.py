@@ -36,8 +36,15 @@ class Enemy(pygame.sprite.Sprite):
         self.facing_right = True
         self.disable_pursue = False
         self.finished_stun = False
-        self.delay = 2
-        self.counter = 0
+        self.stunned_delay = 2
+        self.stunned_counter = 0
+
+        self.triggered = False
+        self.last_player_coords = Vector2()
+        self.total_attack_delta = Vector2()
+        self.attack_cooldown_counter = self.data['attack cooldown']
+
+
         self.image = self.animations[int(self.animation_index)]
         self.rect = self.image.get_rect(topleft=pos)
         self.mask = pygame.mask.from_surface(self.image)
@@ -47,10 +54,15 @@ class Enemy(pygame.sprite.Sprite):
         self.health: int = self.data['health']
         self.damage: int = self.data['damage']
         self.knockback: int = self.data['knockback']
+        self.attack_cooldown = self.data['attack cooldown']
+        self.leap_speed = 15
 
         # Health Bar
         self.health_bar_rect = pygame.Rect(*(self.rect.midtop - Vector2(0, 10)), self.rect.width * 8 / 10, self.rect.height / 6)
         self.health_rect = self.health_bar_rect.copy()
+
+        # Font
+        self.font = pygame.font.Font('./assets/fonts/font.ttf', 30)
 
     def import_assets(self):
         assert self.enemy_name in listdir('./assets/enemies/'), 'Enemy not found in assets'
@@ -63,28 +75,35 @@ class Enemy(pygame.sprite.Sprite):
         with open('./data/enemy_data.json') as rf:
             self.data: dict = json.load(rf)[self.enemy_name]
         
-    def check_collision_with_player(self, player):        
-        if pygame.sprite.spritecollide(self, player, False, pygame.sprite.collide_mask):
-            print('collided')
-
     def persue_player(self, player):
-        if not self.disable_pursue:
-            if Vector2(player.rect.center).distance_to(self.rect.center) <= self.data['pursue radius']:
-                self.delta = Vector2(self.rect.center).move_towards(player.rect.center, self.vel) - Vector2(self.rect.center)
-            
+        if self.disable_pursue and self.triggered:
+            return
+
+        distance = Vector2(player.rect.center).distance_to(self.rect.center)
+
+        if distance <= self.data['attack radius']:
+            if self.attack_cooldown_counter >= self.attack_cooldown:
+                self.triggered = True
+                self.last_player_coords = Vector2(player.rect.center)
             else:
+                self.attack_cooldown_counter += 0.1
                 self.delta = Vector2()
+        
+
+        elif distance <= self.data['pursue radius']:
+            self.delta = Vector2(self.rect.center).move_towards(player.rect.center, self.vel) - Vector2(self.rect.center)
+        
+        else:
+            self.delta = Vector2()
     
     def trigger_delay(self):
         if self.disable_pursue:
-            if self.counter > self.delay:
-                self.counter = 0
-                self.triggered_delay = False
+            if self.stunned_counter > self.stunned_delay:
+                self.stunned_counter = 0
                 self.disable_pursue = False
                 self.image = self.animations[int(self.animation_index)]
-            
             else:
-                self.counter += 0.1
+                self.stunned_counter += 0.1
                 self.delta = Vector2()
                 self.image = self.mask.to_surface()
                 self.image.set_colorkey((0, 0, 0))
@@ -132,8 +151,26 @@ class Enemy(pygame.sprite.Sprite):
         pygame.draw.rect(self.win, colour, self.health_rect)
         pygame.draw.rect(self.win, 'white', self.health_bar_rect, 2)
         
+    def attack_player(self, player):
+        if self.triggered:
+            if self.total_attack_delta.distance_to(Vector2(0, 0)) >= self.data['leap distance'] or self.rect.center == self.last_player_coords:
+                print('finished')
+                self.triggered = False
+                self.total_attack_delta = Vector2()
+                self.attack_cooldown_counter = 0
+                
+            else:
+                self.delta = Vector2(self.rect.center).move_towards(self.last_player_coords, self.leap_speed) - Vector2(self.rect.center)
+
+                self.total_attack_delta += self.delta
+                print(self.total_attack_delta, self.total_attack_delta.distance_to(Vector2(0, 0)))
+                    
+
+
+    
     def update(self, player: pygame.sprite.Sprite, offset: Vector2):
         self.persue_player(player)
+        self.attack_player(player)
         self.trigger_delay()
         self.update_direction()
         self.update_image()
