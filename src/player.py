@@ -44,9 +44,10 @@ class Player(pygame.sprite.Sprite):
         # Player stats
         self.initial_health = self.player_data['health']
         self.health = self.player_data['health'] - 5
+        self.knockback = self.player_data['knockback']
 
         # Player controls
-        self.vel = 5
+        self.vel = 6
         self.controls = {
             'a': pygame.K_a,
             'd': pygame.K_d,
@@ -64,12 +65,14 @@ class Player(pygame.sprite.Sprite):
         self.status = 'idle'
         self.image = self.p_animations[self.status][self.p_animation_index]
         self.rect = self.image.get_rect(center=pos)
+        self.mask = pygame.mask.from_surface(self.image)
+        
+        self.got_attacked = False
 
         # Weapon properties
         self.weapon_image = self.weapons['sword']
         self.particle_images = self.weapons['sword-particles']
 
-    
         # Health Bar
         self.hb_scale_factor = 3
         self.hb_image = pygame.transform.scale((image:=pygame.image.load('./assets/gui/health bar/health_bar.png').convert_alpha()), (image.get_width() * self.hb_scale_factor, image.get_height() * self.hb_scale_factor))
@@ -139,7 +142,7 @@ class Player(pygame.sprite.Sprite):
 
     def user_input(self):
 
-        if self.disable_controls:
+        if self.disable_controls or self.got_attacked:
             return
 
         keys = pygame.key.get_pressed()
@@ -210,6 +213,19 @@ class Player(pygame.sprite.Sprite):
 
         return surf, rect
     
+    def update_direction_from_delta(self, inverse_facing_right=False):
+        if self.delta.x > 0:
+            self.facing_right = True if not inverse_facing_right else False
+            self.direction.x = 1
+        elif self.delta.x < 0:
+            self.facing_right = False if not inverse_facing_right else True
+            self.direction.x = -1
+        
+        if self.delta.y > 0:
+            self.direction.y = 1
+        elif self.delta.y < 0:
+            self.direction.y = -1
+
     def update_player_direction_and_animation_status(self):
         self.facing_right = True if self.pos.x > self.origin.x else False
         self.facing_up = True if self.pos.y < self.origin.y else False
@@ -245,6 +261,9 @@ class Player(pygame.sprite.Sprite):
         self.delta = self.origin.move_towards(self.pos, self.vel * 3 / 4) - self.origin
 
     def sword_mechanics(self, offset):
+        if self.got_attacked:
+            return
+        
         if self.w_delay_counter >= self.w_delay:
             if pygame.mouse.get_pressed()[0] and not self.triggered and not self.clicked: # Initialisation for self.triggered
                     self.clicked = True
