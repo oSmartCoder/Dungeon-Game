@@ -2,24 +2,30 @@
     "red 1": {
         "health": 20,
         "damage": 3,
-        "attack radius": 50,
+        "attack radius": 120,
         "pursue radius": 500,
+        "attack cooldown": 5,
+        "leap distance": 140,
         "knockback": 13
     },
 
     "red 2": {
         "health": 50,
         "damage": 6,
-        "attack radius": 60,
+        "attack radius": 120,
         "pursue radius": 600,
+        "attack cooldown": 5,
+        "leap distance": 140,
         "knockback": 9
     },
 
     "red 3": {
         "health": 90,
         "damage": 10,
-        "attack radius": 65,
+        "attack radius": 120,
         "pursue radius": 700,
+        "attack cooldown": 5,
+        "leap distance": 150,
         "knockback": 8
     }
 }
