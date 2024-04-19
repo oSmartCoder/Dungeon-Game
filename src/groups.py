@@ -97,7 +97,6 @@ class AnimationGroup(Group):
     
     def animate(self):
         for sprite in self.sprites():
-
             sprite.animation_index += sprite.animation_speed
 
             if sprite.animation_index >= len(sprite.animations):
