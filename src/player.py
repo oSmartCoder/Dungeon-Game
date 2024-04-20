@@ -6,6 +6,7 @@ import json
 from math import degrees, atan2
 
 from settings import *
+from support import display_text
 
 
 class Player(pygame.sprite.Sprite):
@@ -43,8 +44,9 @@ class Player(pygame.sprite.Sprite):
 
         # Player stats
         self.initial_health = self.player_data['health']
-        self.health = self.player_data['health'] - 5
+        self.health = self.player_data['health']
         self.knockback = self.player_data['knockback']
+        self.invincibility_cooldown = self.player_data['invincibility cooldown']
 
         # Player controls
         self.vel = 6
@@ -66,8 +68,10 @@ class Player(pygame.sprite.Sprite):
         self.image = self.p_animations[self.status][self.p_animation_index]
         self.rect = self.image.get_rect(center=pos)
         self.mask = pygame.mask.from_surface(self.image)
-        
+
         self.got_attacked = False
+        
+        self.invincibility_counter = 0
 
         # Weapon properties
         self.weapon_image = self.weapons['sword']
@@ -83,11 +87,6 @@ class Player(pygame.sprite.Sprite):
 
         # Load Sounds
         self.import_sounds()
-    
-    def display_text(self, text: str, pos: tuple[int, int], font_size: int=30, colour: str='white'):
-        font = pygame.font.Font('./assets/fonts/font.ttf', font_size)
-        image = font.render(text, True, colour)
-        self.win.blit(image, image.get_rect(center=pos).topleft + Vector2(0, 4))
 
     def import_images(self):
         self.p_animations = {
@@ -138,11 +137,18 @@ class Player(pygame.sprite.Sprite):
         else:
             self.image = pygame.transform.flip(image, True, False)
 
+        if self.got_attacked:
+            if int(self.invincibility_counter * 10) % 6 == 0:
+                self.image.set_alpha(80)
+            else:
+                self.image.set_alpha(200)
+        else:
+            self.image.set_alpha(255)
+
         self.mask = pygame.mask.from_surface(self.image)
 
     def user_input(self):
-
-        if self.disable_controls or self.got_attacked:
+        if self.disable_controls:
             return
 
         keys = pygame.key.get_pressed()
@@ -261,9 +267,6 @@ class Player(pygame.sprite.Sprite):
         self.delta = self.origin.move_towards(self.pos, self.vel * 3 / 4) - self.origin
 
     def sword_mechanics(self, offset):
-        if self.got_attacked:
-            return
-        
         if self.w_delay_counter >= self.w_delay:
             if pygame.mouse.get_pressed()[0] and not self.triggered and not self.clicked: # Initialisation for self.triggered
                     self.clicked = True
@@ -313,13 +316,24 @@ class Player(pygame.sprite.Sprite):
         self.win.blit(self.hb_image, self.hb_template_rect)
         pygame.draw.rect(self.win, 'black', self.health_bar_rect)        
         pygame.draw.rect(self.win, colour, self.health_rect)
-        # self.display_text(f'{self.health}/{self.initial_health}', self.health_rect.center)
+        display_text(self.win, f'{self.health}/{self.initial_health}', self.health_rect.center)
 
+    def invincibility(self, camera_sprites):
+        if self.got_attacked:
+            if self.invincibility_counter >= self.invincibility_cooldown:
+                self.got_attacked = False
+                self.invincibility_counter = 0
 
-    def update(self, offset: Vector2):
-        self.sword_mechanics(offset) # self.sword_mechanics() should be ran before self.user_input() so that self.direction and self.delta values are more accurate (a change of values by one tick/frame could cause some issues/bugs with collision detection)
+            else:
+                if self.invincibility_counter <= self.invincibility_cooldown / 4:
+                    camera_sprites.shake_camera(x_intensity=15, y_intensity=4) 
+                self.invincibility_counter += 0.1
+
+    def update(self, camera_sprites: pygame.sprite.Group):
+        self.sword_mechanics(camera_sprites.offset) # self.sword_mechanics() should be ran before self.user_input() so that self.direction and self.delta values are more accurate (a change of values by one tick/frame could cause some issues/bugs with collision detection)
         self.user_input()
+        self.invincibility(camera_sprites)
         self.animate()
-        self.draw_player(offset)
+        self.draw_player(camera_sprites.offset)
         self.update_health_bar()
         
