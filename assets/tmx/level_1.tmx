@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="64" height="64" tilewidth="16" tileheight="16" infinite="0" nextlayerid="20" nextobjectid="64">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="64" height="64" tilewidth="16" tileheight="16" infinite="0" nextlayerid="20" nextobjectid="65">
  <editorsettings>
   <export target="level_1.csv" format="csv"/>
  </editorsettings>
@@ -1005,6 +1005,9 @@
    <point/>
   </object>
   <object id="63" name="red 2" type="Enemy" x="241" y="689.5">
+   <point/>
+  </object>
+  <object id="64" name="red 1" type="Enemy" x="466.5" y="166.5">
    <point/>
   </object>
  </objectgroup>
