@@ -4,7 +4,6 @@ from pygame.sprite import Sprite, Group
 from pygame.mixer import Sound
 
 from random import randint, choice
-import threading
 
 from settings import *
 
@@ -62,14 +61,13 @@ class CameraGroup(Group):
 
         self.shadow_image = pygame.image.load(f'./assets/characters/shadow.png').convert_alpha()
 
-        self.sc_amount = 10
-
     def center_target_camera(self, target: Sprite):
         self.offset.x = target.rect.centerx - WIN_X / 2
         self.offset.y = target.rect.centery - WIN_Y / 2
     
-    def shake_camera(self):
-        self.offset.x += choice([randint(-self.sc_amount, -self.sc_amount // 2), randint(self.sc_amount // 2, self.sc_amount)])
+    def shake_camera(self, x_intensity: int | float = 10, y_intensity: int | float = 0) -> None:
+        self.offset.x += choice([randint(-x_intensity, -x_intensity // 2), randint(x_intensity // 2, x_intensity)])
+        self.offset.y += choice([randint(-y_intensity, -y_intensity // 2), randint(y_intensity // 2, y_intensity)])
 
     def draw_sprites(self, player: Sprite, active_sprites: Group):
         for sprite in self.sprites():
@@ -85,7 +83,7 @@ class CameraGroup(Group):
             sprite.update(player, self.offset)
     
     def update_player(self, player: Sprite):
-        player.update(self.offset)
+        player.update(self)
 
 
 class AnimationGroup(Group):
@@ -110,7 +108,6 @@ class InteractiveGroup(Group):
         super().__init__()
 
         self.win = pygame.display.get_surface()
-
     
     def update(self):
         pass
@@ -125,9 +122,10 @@ class ActiveGroup(Group):
         self.enemy_hurt_sound = Sound('./assets/sounds/enemies/enemy_hurt.wav')
         self.enemy_die_sound = Sound('./assets/sounds/enemies/enemy_die.wav')
 
-        self.continue_thread = False
+        self.player_hurt_sound = Sound('./assets/sounds/player/player_hurt.mp3')
+        self.player_hurt_final_sound = Sound('./assets/sounds/player/player_hurt_final.mp3')
 
-
+        self.death_music = Sound('./assets/sounds/music/death_music.mp3')
 
     def check_collision_between_sprites(self, camera_sprites: Group):
         player = self.sprites()[0]
@@ -148,13 +146,19 @@ class ActiveGroup(Group):
                     else:
                         enemy_sprite.delta = player.origin.move_towards(player.pos, enemy_sprite.knockback) - player.origin
                         enemy_sprite.update_direction(inverse_facing_right=True)
-                        camera_sprites.shake_camera()
+                        camera_sprites.shake_camera(y_intensity=2)
 
             if enemy_sprite.triggered:
                 if enemy_sprite.mask.overlap(player.mask, enemy_sprite.rect.topleft - Vector2(player.rect.topleft)):
-                    player.got_attacked = True
-                    player.delta = Vector2(enemy_sprite.rect.center).move_towards(enemy_sprite.last_player_coords, player.knockback) - enemy_sprite.rect.center
-                    player.update_direction_from_delta(inverse_facing_right=True)
-                else:
-                    player.got_attacked = False
-                    print('not attacked')
+                    if player.health <= 0:
+                        print('you died lol')
+                        self.death_music.play()
+                    
+                    elif not player.got_attacked:
+                        player.health -= enemy_sprite.damage
+                        self.player_hurt_sound.play() if player.health / player.initial_health >= 0.3 else self.player_hurt_final_sound.play()
+                        player.got_attacked = True
+
+                    else:
+                        player.delta = Vector2(enemy_sprite.player_delta)
+                        player.update_direction_from_delta(inverse_facing_right=True)
