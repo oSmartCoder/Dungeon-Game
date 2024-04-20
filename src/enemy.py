@@ -1,9 +1,11 @@
 import pygame
 from pygame.math import Vector2
+from pygame.mixer import Sound
 
 import json
 from typing import Tuple
 from os import listdir
+from math import sqrt
 
 from settings import *
 
@@ -20,7 +22,8 @@ class Enemy(pygame.sprite.Sprite):
 
         self.scale_factor = 4
 
-        self.import_assets()
+        self.import_images()
+        self.import_sounds()
         self.import_enemy_data()
 
         # Animation setup
@@ -40,9 +43,12 @@ class Enemy(pygame.sprite.Sprite):
         self.stunned_counter = 0
 
         self.triggered = False
+        self.attack_state = False
         self.last_player_coords = Vector2()
-        self.total_attack_delta = Vector2()
+        self.last_enemy_coords = Vector2()
+        self.new_coords = Vector2()
         self.attack_cooldown_counter = self.data['attack cooldown']
+        self.total_attack_delta = Vector2()
 
 
         self.image = self.animations[int(self.animation_index)]
@@ -55,7 +61,7 @@ class Enemy(pygame.sprite.Sprite):
         self.damage: int = self.data['damage']
         self.knockback: int = self.data['knockback']
         self.attack_cooldown = self.data['attack cooldown']
-        self.leap_speed = 15
+        self.leap_speed = self.data['leap speed']
 
         # Health Bar
         self.health_bar_rect = pygame.Rect(*(self.rect.midtop - Vector2(0, 10)), self.rect.width * 8 / 10, self.rect.height / 6)
@@ -64,31 +70,30 @@ class Enemy(pygame.sprite.Sprite):
         # Font
         self.font = pygame.font.Font('./assets/fonts/font.ttf', 30)
 
-    def import_assets(self):
+    def import_images(self):
         assert self.enemy_name in listdir('./assets/enemies/'), 'Enemy not found in assets'
 
         edited_enemy_name = '_'.join(self.enemy_name.split(' '))
 
         self.animations = [pygame.transform.scale(image:=pygame.image.load(f'./assets/enemies/{self.enemy_name}/{edited_enemy_name}_{i}.png').convert_alpha(), (image.get_width() * self.scale_factor, image.get_height() * self.scale_factor)) for i in range(1, 5)]
 
+    def import_sounds(self):
+        self.enemy_leap_sound = Sound('./assets/sounds/enemies/enemy_leap.mp3')
+
     def import_enemy_data(self):
         with open('./data/enemy_data.json') as rf:
             self.data: dict = json.load(rf)[self.enemy_name]
         
     def persue_player(self, player):
-        if self.disable_pursue and self.triggered:
+        if self.disable_pursue or self.triggered:
             return
 
         distance = Vector2(player.rect.center).distance_to(self.rect.center)
 
         if distance <= self.data['attack radius']:
-            if self.attack_cooldown_counter >= self.attack_cooldown:
-                self.triggered = True
-                self.last_player_coords = Vector2(player.rect.center)
-            else:
-                self.attack_cooldown_counter += 0.1
-                self.delta = Vector2()
-        
+            self.attack_state = True
+            self.last_player_coords = Vector2(player.rect.center)
+            self.last_enemy_coords = Vector2(self.rect.center)
 
         elif distance <= self.data['pursue radius']:
             self.delta = Vector2(self.rect.center).move_towards(player.rect.center, self.vel) - Vector2(self.rect.center)
@@ -151,22 +156,76 @@ class Enemy(pygame.sprite.Sprite):
         pygame.draw.rect(self.win, colour, self.health_rect)
         pygame.draw.rect(self.win, 'white', self.health_bar_rect, 2)
         
+    def get_new_vector(self, x1: float, y1: float, x2: float, y2: float, d: float) -> tuple[float, float]:
+        if x2 - x1 == 0:
+            x3 = float(x1)
+            
+            if y2 - y1 > 0: # if player is below the enemy
+                y3 = y1 + d
+
+            elif y2 - y1 < 0: # if player is above the enemy
+                y3 = y1 - d
+
+            else:
+                raise ValueError('y2 - y1 should not be zero.')
+        
+        elif y2 - y1 == 0:
+            y3 = float(y1)
+
+            if x2 - x1 > 0: # if player is to the right of enemy
+                x3 = x1 + d
+
+            elif x2 - x1 < 0: # if player is to the left of enemy
+                x3 = x1 - d
+            
+            else:
+                raise ValueError('y2 - y1 should not be zero.')
+
+        else:
+            m = (y2 - y1) / (x2 - x1)
+            c = y1 - (m * x1)
+
+            f = lambda x: m * x + c
+
+            x3 = (-sqrt(2*c*(y1- x1*m) - (y1 - x1*m)**2 - c**2 + d**2*(m**2 + 1) + x1 - c*m + y1*m)) / m**2 + 1
+
+            y3 = f(x3)
+        
+        return Vector2(x3, y3)
+    
     def attack_player(self, player):
+        if not self.attack_state:
+            return
+        
+        if self.attack_cooldown_counter >= self.attack_cooldown:
+            self.triggered = True
+            # self.enemy_leap_sound.play()
+        else:
+            self.attack_cooldown_counter += 0.1
+
         if self.triggered:
-            if self.total_attack_delta.distance_to(Vector2(0, 0)) >= self.data['leap distance'] or self.rect.center == self.last_player_coords:
-                print('finished')
+            if self.total_attack_delta.distance_to(Vector2(0, 0)) >= self.data['leap distance']:
+                self.attack_state = False
                 self.triggered = False
                 self.total_attack_delta = Vector2()
                 self.attack_cooldown_counter = 0
-                
+
             else:
-                self.delta = Vector2(self.rect.center).move_towards(self.last_player_coords, self.leap_speed) - Vector2(self.rect.center)
+                # Calculates new point given the origin point, rule, and distance to that point
+                d = self.data['leap distance']
+                x1, y1 = self.last_enemy_coords
+                x2, y2 = self.last_player_coords
+                x3, y3 = self.get_new_vector(x1, y1, x2, y2, d)
+
+                self.delta = Vector2(x1, y1).move_towards((x3, y3), self.leap_speed) - Vector2(x1, y1)
+                self.player_delta = Vector2(x1, y1).move_towards((x3, y3), player.knockback) - Vector2(x1, y1)
+
+                # since pygame flips the y axis, we have to calculate for new delta values
+                if x2 - x1 > 0:
+                    self.delta *= -1
+                    self.player_delta *= -1
 
                 self.total_attack_delta += self.delta
-                print(self.total_attack_delta, self.total_attack_delta.distance_to(Vector2(0, 0)))
-                    
-
-
     
     def update(self, player: pygame.sprite.Sprite, offset: Vector2):
         self.persue_player(player)
