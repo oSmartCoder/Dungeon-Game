@@ -4,7 +4,7 @@
         "damage": 3,
         "attack radius": 120,
         "pursue radius": 500,
-        "attack cooldown": 8,
+        "attack cooldown": 3,
         "leap distance": 120,
         "leap speed": 18,
         "knockback": 13
@@ -15,7 +15,7 @@
         "damage": 6,
         "attack radius": 120,
         "pursue radius": 600,
-        "attack cooldown": 8,
+        "attack cooldown": 3,
         "leap distance": 120,
         "leap speed": 18,
         "knockback": 9
@@ -26,7 +26,7 @@
         "damage": 10,
         "attack radius": 120,
         "pursue radius": 700,
-        "attack cooldown": 8,
+        "attack cooldown": 3,
         "leap distance": 130,
         "leap speed": 18,
         "knockback": 8

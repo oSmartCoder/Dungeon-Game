@@ -8,6 +8,7 @@ from .tile import *
 from .groups import CollisionGroup, CameraGroup, AnimationGroup, InteractiveGroup, ActiveGroup
 from .enemy import Enemy
 from settings import *
+from support import display_text
 
 
 class Game:
@@ -29,6 +30,8 @@ class Game:
         # self.music = Sound('./assets/sounds/music/mountain trials.mp3')
         # self.music.set_volume(0.05)
         # self.music.play(loops=-1)
+
+        self.coin_image = pygame.transform.scale(pygame.image.load('./assets/sprite animations/coin/coin_1.png').convert_alpha(), (TILE_SIZE, TILE_SIZE))
 
     def load_level(self):
         tmx_data = load_pygame('./assets/tmx/level_1.tmx')
@@ -85,6 +88,15 @@ class Game:
                 case _:
                     Enemy(pos, [self.camera_sprites, self.animation_sprites, self.active_sprites, self.enemy_sprites], obj.name)
                 
+    def display_coin_counter(self):
+        self.win.blit(self.coin_image, self.coin_image.get_rect(center=(40, 100)).topleft)
+
+        display_text(self.win, f'x{self.player.sprite.coins}', (80, 105))
+
+        
+
+
+
     def update(self):        
         self.collision_sprites.update_active_sprites_position(self.active_sprites, self.player.sprite)
 
@@ -100,11 +112,7 @@ class Game:
 
         self.animation_sprites.animate()
 
-        
+        self.interactive_sprites.update_collision(self.player.sprite)
 
-
-
-
-        
-
+        self.display_coin_counter()
 

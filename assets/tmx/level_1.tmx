@@ -1007,8 +1007,5 @@
   <object id="63" name="red 2" type="Enemy" x="241" y="689.5">
    <point/>
   </object>
-  <object id="64" name="red 1" type="Enemy" x="466.5" y="166.5">
-   <point/>
-  </object>
  </objectgroup>
 </map>

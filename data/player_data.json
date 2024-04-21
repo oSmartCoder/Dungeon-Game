@@ -2,5 +2,5 @@
     "health": 50,
     "absorption": 0,
     "knockback": 5,
-    "invincibility cooldown": 10
+    "invincibility cooldown": 6
 }

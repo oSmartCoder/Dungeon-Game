@@ -20,6 +20,7 @@ class CollisionGroup(Group):
         Note: All active sprites must have a delta (rate of change) and rect (sprite rect) attribute
         """
 
+        # player 
         for sprite in sprite_group:
             if active_sprite in sprite_group:
                 collision_condition = active_sprite.rect.colliderect(sprite.rect) and not player in (active_sprite, sprite) and active_sprite != sprite
@@ -43,12 +44,12 @@ class CollisionGroup(Group):
     def update_active_sprites_position(self, active_sprites: Group, player: Sprite):
         for active_sprite in active_sprites:
             active_sprite.rect.x += active_sprite.delta.x
-            self.check_collision(active_sprite, self, 'horizontal', player)
-            self.check_collision(active_sprite, active_sprites, 'horizontal', player)
+            self.check_collision(active_sprite, self, 'horizontal', player) # check horizontal collision with collision sprites
+            self.check_collision(active_sprite, active_sprites, 'horizontal', player) # check horizontal collision with own active sprites
 
             active_sprite.rect.y += active_sprite.delta.y
-            self.check_collision(active_sprite, self, 'vertical', player)
-            self.check_collision(active_sprite, active_sprites, 'vertical', player)
+            self.check_collision(active_sprite, self, 'vertical', player) # check vertical collision with collision sprites
+            self.check_collision(active_sprite, active_sprites, 'vertical', player) # check vertical collision with own active sprites
 
 
 class CameraGroup(Group):
@@ -109,8 +110,27 @@ class InteractiveGroup(Group):
 
         self.win = pygame.display.get_surface()
     
-    def update(self):
-        pass
+    def update_collision(self, player: Sprite):
+        for sprite in self.sprites():
+            if player.rect.colliderect(sprite.rect):
+                if player.mask.overlap(sprite.mask, sprite.rect.topleft - Vector2(player.rect.topleft)):
+                    match sprite.layer_name:
+                        case 'Coin':
+                            player.coins += 1
+                            sprite.kill()
+
+                        case 'Small Red Flask':
+                            player.health += player.initial_health // 6
+                            if player.health > player.initial_health:
+                                player.health = player.initial_health
+                            sprite.kill()
+
+                        case 'Ladder':
+                            print('you win!')
+
+                        case _:
+                            pass
+
 
 
 class ActiveGroup(Group):
@@ -151,7 +171,7 @@ class ActiveGroup(Group):
             if enemy_sprite.triggered:
                 if enemy_sprite.mask.overlap(player.mask, enemy_sprite.rect.topleft - Vector2(player.rect.topleft)):
                     if player.health <= 0:
-                        print('you died lol')
+                        player.health = 0
                         self.death_music.play()
                     
                     elif not player.got_attacked:

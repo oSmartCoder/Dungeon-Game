@@ -73,6 +73,9 @@ class Player(pygame.sprite.Sprite):
         
         self.invincibility_counter = 0
 
+        # Player attributes
+        self.coins = 0
+
         # Weapon properties
         self.weapon_image = self.weapons['sword']
         self.particle_images = self.weapons['sword-particles']
@@ -316,7 +319,7 @@ class Player(pygame.sprite.Sprite):
         self.win.blit(self.hb_image, self.hb_template_rect)
         pygame.draw.rect(self.win, 'black', self.health_bar_rect)        
         pygame.draw.rect(self.win, colour, self.health_rect)
-        display_text(self.win, f'{self.health}/{self.initial_health}', self.health_rect.center)
+        display_text(self.win, f'{self.health}/{self.initial_health}', self.hb_template_rect.center + Vector2(0, 4))
 
     def invincibility(self, camera_sprites):
         if self.got_attacked:
