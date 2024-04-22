@@ -13,34 +13,8 @@ class Tile(pygame.sprite.Sprite):
         self.layer_name = layer_name
 
 
-class AnimatedTile(Tile):
-    def __init__(self, pos, surface, groups, layer_name):
-        super().__init__(pos, surface, groups, layer_name)
-
-
-# Non-animated tiles
-
-
-class Door(Tile):
-    def __init__(self, pos, surface, groups, layer_name):
-        super().__init__(pos, surface, groups, layer_name)
-
-
-class Ladder(Tile):
-    def __init__(self, pos, surface, groups, layer_name):
-        super().__init__(pos, surface, groups, layer_name)
-
-
-# Animated Tiles
-
-
-class Chest(AnimatedTile):
-    def __init__(self, pos, surface, groups, layer_name):
-        super().__init__(pos, surface, groups, layer_name)
-
-        self.animation_index = 0
-        self.animation_speed = 0.1
-
+class Chest(Tile):
+    def __init__(self, pos, groups, layer_name):
         match layer_name:
             case 'Chest':
                 self.animations = [pygame.transform.scale(pygame.image.load(f'./assets/sprite animations/chest/chest_{i}.png').convert_alpha(), (TILE_SIZE, TILE_SIZE)) for i in range(1, 5)]
@@ -50,15 +24,15 @@ class Chest(AnimatedTile):
             
             case _:
                 raise ValueError(f'Cannot assign layer \'{layer_name}\' to {__class__.__name__}.animations')
-                
-
-class Coin(AnimatedTile):
-    def __init__(self, pos, surface, groups, layer_name):
-        super().__init__(pos, surface, groups, layer_name)
+        
+        super().__init__(pos, self.animations[0], groups, layer_name)
 
         self.animation_index = 0
         self.animation_speed = 0.1
+                
 
+class Coin(Tile):
+    def __init__(self, pos, groups, layer_name):
         match layer_name:
             case 'Coin':
                 self.animations = [pygame.transform.scale(pygame.image.load(f'./assets/sprite animations/coin/coin_{i}.png'), (TILE_SIZE, TILE_SIZE)) for i in range(1, 5)]
@@ -66,14 +40,14 @@ class Coin(AnimatedTile):
             case _:
                 raise ValueError(f'Cannot assign layer \'{layer_name}\' to {__class__.__name__}.animations')
             
-
-class Flask(AnimatedTile):
-    def __init__(self, pos, surface, groups, layer_name):
-        super().__init__(pos, surface, groups, layer_name)
-        
+        super().__init__(pos, self.animations[0], groups, layer_name)
+    
         self.animation_index = 0
         self.animation_speed = 0.1
+            
 
+class Flask(Tile):
+    def __init__(self, pos, groups, layer_name):
         match layer_name:
             case 'Small Blue Flask':
                 self.animations = [pygame.transform.scale(pygame.image.load(f'./assets/sprite animations/flasks/small_blue_flask_{i}.png').convert_alpha(), (TILE_SIZE, TILE_SIZE)) for i in range(1, 5)]
@@ -89,15 +63,15 @@ class Flask(AnimatedTile):
 
             case _:
                 raise ValueError(f'Cannot assign layer \'{layer_name}\' to {__class__.__name__}.animations')
-
-
-class Key(AnimatedTile):
-    def __init__(self, pos, surface, groups, layer_name):
-        super().__init__(pos, surface, groups, layer_name)
-
+            
+        super().__init__(pos, self.animations[0], groups, layer_name)
+    
         self.animation_index = 0
         self.animation_speed = 0.1
 
+
+class Key(Tile):
+    def __init__(self, pos, groups, layer_name):
         match layer_name:
             case 'Golden Key':
                 self.animations = [pygame.transform.scale(pygame.image.load(f'./assets/sprite animations/keys/golden_key_{i}.png').convert_alpha(), (TILE_SIZE, TILE_SIZE)) for i in range(1, 5)]
@@ -108,14 +82,14 @@ class Key(AnimatedTile):
             case _:
                 raise ValueError(f'Cannot assign layer \'{layer_name}\' to {__class__.__name__}.animations')
 
-
-class Torch(AnimatedTile):
-    def __init__(self, pos, surface, groups, layer_name):
-        super().__init__(pos, surface, groups, layer_name)
-
+        super().__init__(pos, self.animations[0], groups, layer_name)
+    
         self.animation_index = 0
         self.animation_speed = 0.1
 
+
+class Torch(Tile):
+    def __init__(self, pos, groups, layer_name):
         match layer_name:
             case 'Front Torch':
                 self.animations = [pygame.transform.scale(pygame.image.load(f'./assets/sprite animations/torch/front_torch_{i}.png').convert_alpha(), (TILE_SIZE, TILE_SIZE)) for i in range(1, 5)]
@@ -134,29 +108,30 @@ class Torch(AnimatedTile):
 
             case _:
                 raise ValueError(f'Cannot assign layer \'{layer_name}\' to {__class__.__name__}.animations')
-
-
-class Flag(AnimatedTile):
-    def __init__(self, pos, surface, groups, layer_name):
-        super().__init__(pos, surface, groups, layer_name)
-
+            
+        super().__init__(pos, self.animations[0], groups, layer_name)
+    
         self.animation_index = 0
         self.animation_speed = 0.1
 
+
+class Flag(Tile):
+    def __init__(self, pos, groups, layer_name):
         match layer_name:
             case 'Flag':
                 self.animations = [pygame.transform.scale(pygame.image.load(f'./assets/sprite animations/flag/flag_{i}.png').convert_alpha(), (TILE_SIZE, TILE_SIZE)) for i in range(1, 5)]
 
             case _:
                 raise ValueError(f'Cannot assign layer \'{layer_name}\' to {__class__.__name__}.animations')
-
-
-class Box(AnimatedTile):
-    def __init__(self, pos, surface, groups, layer_name):
-        super().__init__(pos, surface, groups, layer_name)
-
-        self.animation_index = 0
+            
+        super().__init__(pos, self.animations[0], groups, layer_name)
     
+        self.animation_index = 0
+        self.animation_speed = 0.1
+
+
+class Box(Tile):
+    def __init__(self, pos, groups, layer_name):    
         match layer_name:
             case 'Mini Silver Box':
                 self.animations = [pygame.transform.scale(pygame.image.load(f'./assets/sprite animations/mini_silver_box/mini_silver_box_{i}.png').convert_alpha(), (TILE_SIZE, TILE_SIZE)) for i in range(1, 5)]
@@ -172,3 +147,8 @@ class Box(AnimatedTile):
 
             case _:
                 raise ValueError(f'Cannot assign layer \'{layer_name}\' to {__class__.__name__}.animations')
+            
+        super().__init__(pos, self.animations[0], groups, layer_name)
+    
+        self.animation_index = 0
+        self.animation_speed = 0.1
