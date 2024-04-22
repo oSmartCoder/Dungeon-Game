@@ -93,23 +93,25 @@ class Player(pygame.sprite.Sprite):
 
     def import_images(self):
         self.p_animations = {
-            'idle': [pygame.transform.scale((image:=pygame.image.load(f'./assets/characters/player1/idle_{i}.png')).convert_alpha(), (image.get_width() * self.p_scale_factor, image.get_height() * (self.p_scale_factor + 0.2))) for i in range(1, 3)],
-            'idle-up': [pygame.transform.scale((image:=pygame.image.load(f'./assets/characters/player1/idle_up_{i}.png')).convert_alpha(), (image.get_width() * self.p_scale_factor, image.get_height() * (self.p_scale_factor + 0.2))) for i in range(1, 2)],
-            'run': [pygame.transform.scale((image:=pygame.image.load(f'./assets/characters/player1/run_{i}.png')).convert_alpha(), (image.get_width() * self.p_scale_factor, image.get_height() * (self.p_scale_factor + 0.2))) for i in range(1, 5)],
-            'run-finish': [pygame.transform.scale((image:=pygame.image.load(f'./assets/characters/player1/run_finish_{i}.png')).convert_alpha(), (image.get_width() * self.p_scale_factor, image.get_height() * self.p_scale_factor)) for i in range(1, 4)],
-            'run-up': [pygame.transform.scale((image:=pygame.image.load(f'./assets/characters/player1/run_up_{i}.png')).convert_alpha(), (image.get_width() * self.p_scale_factor, image.get_height() * (self.p_scale_factor + 0.2))) for i in range(1, 4)],
-            'run-up-finish': [pygame.transform.scale((image:=pygame.image.load(f'./assets/characters/player1/run_up_finish_{i}.png')).convert_alpha(), (image.get_width() * self.p_scale_factor, image.get_height() * self.p_scale_factor)) for i in range(1, 4)],
+            'idle': [pygame.transform.scale_by(pygame.image.load(f'./assets/characters/player1/idle_{i}.png').convert_alpha(), (self.p_scale_factor, self.p_scale_factor + 0.2)) for i in range(1, 3)],
+            'idle-up': [pygame.transform.scale_by(pygame.image.load(f'./assets/characters/player1/idle_up_{i}.png').convert_alpha(), (self.p_scale_factor, self.p_scale_factor + 0.2)) for i in range(1, 2)],
+            'run': [pygame.transform.scale_by(pygame.image.load(f'./assets/characters/player1/run_{i}.png').convert_alpha(), (self.p_scale_factor, self.p_scale_factor + 0.2)) for i in range(1, 5)],
+            'run-finish': [pygame.transform.scale_by(pygame.image.load(f'./assets/characters/player1/run_finish_{i}.png').convert_alpha(), (self.p_scale_factor, self.p_scale_factor + 0.2)) for i in range(1, 4)],
+            'run-up': [pygame.transform.scale_by(pygame.image.load(f'./assets/characters/player1/run_up_{i}.png').convert_alpha(), (self.p_scale_factor, self.p_scale_factor + 0.2))for i in range(1, 4)],
+            'run-up-finish': [pygame.transform.scale_by(pygame.image.load(f'./assets/characters/player1/run_up_finish_{i}.png').convert_alpha(), (self.p_scale_factor, self.p_scale_factor + 0.2)) for i in range(1, 4)],
         }
 
         self.weapons = {
-            'sword': pygame.transform.rotate(pygame.transform.scale((image:=pygame.image.load(f'./assets/weapons/stone/stone_sword_2.png').convert_alpha()), (image.get_width() * self.w_scale_factor, image.get_height() * self.w_scale_factor)), -45), # 45 degrees offset
-            'sword-particles': [pygame.transform.scale((image:=pygame.image.load(f'./assets/weapons/sword_particles_{i}.png')), (image.get_width() * self.w_scale_factor, image.get_height() * self.w_scale_factor)) for i in range(1, 3)] # -90 degrees offset
+            'sword': pygame.transform.rotate(pygame.transform.scale_by(pygame.image.load(f'./assets/weapons/stone/stone_sword_2.png').convert_alpha(), self.w_scale_factor), -45), # 45 degrees offset
+            'sword-particles': [pygame.transform.scale_by(pygame.image.load(f'./assets/weapons/sword_particles_{i}.png'), self.w_scale_factor) for i in range(1, 3)] # -90 degrees offset
         }
 
     def import_sounds(self):
         self.sword_sound = Sound('./assets/sounds/items/sword.wav')
-        self.player_hurt_sound = Sound('./assets/sounds/player/player_hurt.wav')
         self.player_roll_sound = Sound('./assets/sounds/player/player_roll.wav')
+        # self.footsteps_sound = Sound('./assets/sounds/player/footsteps.wav')
+
+
 
     def import_data(self):
         # Import weapon data
@@ -165,6 +167,9 @@ class Player(pygame.sprite.Sprite):
                 case 'run-up' if self.facing_up:
                     self.status = 'run-up-finish'
             return
+        
+        if any([keys[control] for control in self.controls.values()]):
+            pass
 
         if keys[self.controls['d']]:
             self.facing_right = True
@@ -260,8 +265,8 @@ class Player(pygame.sprite.Sprite):
         self.win.blit(image, self.weapon_rect)
 
     def draw_sword_particles(self, angle: float):
-            particle_image = pygame.transform.flip(self.particle_images[round(self.w_animation_counter / self.w_animation_period)], True, False) if self.sword_direction == 1 else pygame.transform.flip(self.particle_images[round(self.w_animation_counter / self.w_animation_period)], True, True)
-            particle_image, self.particle_rect = self.rotate_on_pivot(particle_image, angle, self.origin, Vector2(48, -15 if self.sword_direction == 1 else 15))
+            particle_image = self.particle_images[round(self.w_animation_counter / self.w_animation_period)] if self.sword_direction == 1 else pygame.transform.flip(self.particle_images[round(self.w_animation_counter / self.w_animation_period)], False, True)
+            particle_image, self.particle_rect = self.rotate_on_pivot(particle_image, angle, self.origin, Vector2(45, -15 if self.sword_direction == 1 else 15))
             self.particle_mask = pygame.mask.from_surface(particle_image)
 
             self.win.blit(particle_image, self.particle_rect)
