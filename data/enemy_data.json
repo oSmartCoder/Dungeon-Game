@@ -2,33 +2,48 @@
     "red 1": {
         "health": 20,
         "damage": 3,
-        "attack radius": 120,
+        "attack radius": 150,
         "pursue radius": 500,
         "attack cooldown": 3,
         "leap distance": 120,
-        "leap speed": 18,
-        "knockback": 13
+        "leap speed": 22,
+        "knockback": 13,
+        "coin drops": 2
     },
 
     "red 2": {
-        "health": 50,
+        "health": 40,
         "damage": 6,
-        "attack radius": 120,
+        "attack radius": 150,
         "pursue radius": 600,
         "attack cooldown": 3,
-        "leap distance": 120,
-        "leap speed": 18,
-        "knockback": 9
+        "leap distance": 140,
+        "leap speed": 22,
+        "knockback": 9,
+        "coin drops": 4
     },
 
     "red 3": {
-        "health": 90,
-        "damage": 10,
-        "attack radius": 120,
+        "health": 80,
+        "damage": 8,
+        "attack radius": 150,
         "pursue radius": 700,
         "attack cooldown": 3,
-        "leap distance": 130,
-        "leap speed": 18,
-        "knockback": 8
+        "leap distance": 150,
+        "leap speed": 22,
+        "knockback": 8,
+        "coin drops": 8
+    },
+
+    "red 4": {
+        "health": 120,
+        "damage": 15,
+        "attack radius": 150,
+        "pursue radius": 700,
+        "attack cooldown": 3,
+        "leap distance": 160,
+        "leap speed": 22,
+        "knockback": 7,
+        "coin drops": 15
     }
 }
