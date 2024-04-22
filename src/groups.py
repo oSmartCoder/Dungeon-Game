@@ -6,7 +6,7 @@ from pygame.mixer import Sound
 from random import randint, choice
 
 from settings import *
-
+from .tile import Coin
 
 
 class CollisionGroup(Group):
@@ -109,6 +109,8 @@ class InteractiveGroup(Group):
         super().__init__()
 
         self.win = pygame.display.get_surface()
+
+        self.coin_sound = Sound('./assets/sounds/items/coin-edit.wav')
     
     def update_collision(self, player: Sprite):
         for sprite in self.sprites():
@@ -117,13 +119,25 @@ class InteractiveGroup(Group):
                     match sprite.layer_name:
                         case 'Coin':
                             player.coins += 1
+                            self.coin_sound.play()
                             sprite.kill()
 
                         case 'Small Red Flask':
                             player.health += player.initial_health // 6
                             if player.health > player.initial_health:
                                 player.health = player.initial_health
+                            self.coin_sound.play() # Temporary until I find a sound for this
                             sprite.kill()
+
+                        case 'Small Blue Flask':
+                            player.health += player.initial_health // 6
+                            if player.health > player.initial_health:
+                                player.health = player.initial_health
+                            self.coin_sound.play() # Temporary until I find a sound for this
+                            sprite.kill()
+
+                        case 'Chest':
+                            pass
 
                         case 'Ladder':
                             print('you win!')
@@ -142,12 +156,12 @@ class ActiveGroup(Group):
         self.enemy_hurt_sound = Sound('./assets/sounds/enemies/enemy_hurt.wav')
         self.enemy_die_sound = Sound('./assets/sounds/enemies/enemy_die.wav')
 
-        self.player_hurt_sound = Sound('./assets/sounds/player/player_hurt.mp3')
+        self.player_hurt_sound = Sound('./assets/sounds/player/player_hurt.wav')
         self.player_hurt_final_sound = Sound('./assets/sounds/player/player_hurt_final.mp3')
 
         self.death_music = Sound('./assets/sounds/music/death_music.mp3')
 
-    def check_collision_between_sprites(self, camera_sprites: Group):
+    def check_collision_between_sprites(self, camera_sprites: Group, animation_sprites: Group, interactive_sprites: Group):
         player = self.sprites()[0]
         enemy_sprites = self.sprites()[1:]
         
@@ -155,6 +169,7 @@ class ActiveGroup(Group):
             if player.triggered:
                 if enemy_sprite.mask.overlap(player.particle_mask, (player.particle_rect.topleft + camera_sprites.offset - enemy_sprite.rect.topleft)):
                     if enemy_sprite.health <= 0:
+                        [Coin(enemy_sprite.rect.center + Vector2(randint(1, 30 ), randint(1, 30)), [camera_sprites, animation_sprites, interactive_sprites], 'Coin') for _ in range(enemy_sprite.coin_drops)]
                         enemy_sprite.kill()
                         self.enemy_die_sound.play()
 
