@@ -3,6 +3,8 @@ from pygame.mixer import Sound
 from pytmx import TiledTileLayer
 from pytmx.util_pygame import load_pygame
 
+from random import choice
+
 from .player import Player
 from .tile import *
 from .groups import CollisionGroup, CameraGroup, AnimationGroup, InteractiveGroup, ActiveGroup
@@ -27,11 +29,18 @@ class Game:
 
         self.load_level()
 
-        # self.music = Sound('./assets/sounds/music/mountain trials.mp3')
-        # self.music.set_volume(0.05)
-        # self.music.play(loops=-1)
+        self.import_music()
 
         self.coin_image = pygame.transform.scale(pygame.image.load('./assets/sprite animations/coin/coin_1.png').convert_alpha(), (TILE_SIZE, TILE_SIZE))
+
+    def import_music(self):
+        self.tracks = []
+
+        for track in [Sound(f'./assets/sounds/music/{track_name}.mp3') for track_name in ['otherworld']]:
+            track.set_volume(0.1)
+            self.tracks.append(track)
+
+        choice(self.tracks).play(loops=-1, fade_ms=2)
 
     def load_level(self):
         tmx_data = load_pygame('./assets/tmx/level_1.tmx')
@@ -50,31 +59,31 @@ class Game:
                             Tile(pos, image, [self.camera_sprites, self.collision_sprites], layer.name)
                         
                         case 'Chest' | 'Mini Chest':
-                            Chest(pos, image, [self.camera_sprites, self.collision_sprites, self.animation_sprites, self.interactive_sprites], layer.name)
+                            Chest(pos, [self.camera_sprites, self.collision_sprites, self.animation_sprites, self.interactive_sprites], layer.name)
 
                         case 'Small Red Flask' | 'Large Red Flask' | 'Small Blue Flask' | 'Large Blue Flask':
-                            Flask(pos, image, [self.camera_sprites, self.animation_sprites, self.interactive_sprites], layer.name)
+                            Flask(pos, [self.camera_sprites, self.animation_sprites, self.interactive_sprites], layer.name)
 
                         case 'Flag':
-                            Flag(pos, image, [self.camera_sprites, self.animation_sprites], layer.name)
+                            Flag(pos, [self.camera_sprites, self.animation_sprites], layer.name)
 
                         case 'Front Torch' | 'Right Torch' | 'Left Torch' | 'Small Candlestick' | 'Tall Candlestick':
-                            Torch(pos, image, [self.camera_sprites, self.animation_sprites], layer.name)
+                            Torch(pos, [self.camera_sprites, self.animation_sprites], layer.name)
 
                         case 'Coin':
-                            Coin(pos, image, [self.camera_sprites, self.animation_sprites, self.interactive_sprites], layer.name)
+                            Coin(pos, [self.camera_sprites, self.animation_sprites, self.interactive_sprites], layer.name)
                         
                         case 'Ladder':
-                            Ladder(pos, image, [self.camera_sprites, self.interactive_sprites], layer.name)
+                            Tile(pos, image, [self.camera_sprites, self.interactive_sprites], layer.name)
                         
                         case 'Golden Key' | 'Silver Key':
-                            Key(pos, image, [self.camera_sprites, self.animation_sprites, self.interactive_sprites], layer.name)
+                            Key(pos, [self.camera_sprites, self.animation_sprites, self.interactive_sprites], layer.name)
                         
                         case 'Mini Brown Box' | 'Mini Silver Box' | 'Brown Box' | 'Silver Box':
-                            Box(pos, image, [self.camera_sprites, self.animation_sprites, self.interactive_sprites], layer.name)
+                            Box(pos, [self.camera_sprites, self.animation_sprites, self.interactive_sprites], layer.name)
         
                         case 'Door':
-                            Door(pos, image, [self.camera_sprites, self.interactive_sprites], layer.name)
+                            Tile(pos, image, [self.camera_sprites, self.interactive_sprites], layer.name)
 
                         case _:
                             raise ValueError(f'Cannot assign layer \'{layer.name}\' to associated class')
@@ -93,10 +102,6 @@ class Game:
 
         display_text(self.win, f'x{self.player.sprite.coins}', (80, 105))
 
-        
-
-
-
     def update(self):        
         self.collision_sprites.update_active_sprites_position(self.active_sprites, self.player.sprite)
 
@@ -106,7 +111,7 @@ class Game:
 
         self.camera_sprites.center_target_camera(self.player.sprite)
 
-        self.active_sprites.check_collision_between_sprites(self.camera_sprites)
+        self.active_sprites.check_collision_between_sprites(self.camera_sprites, self.animation_sprites, self.interactive_sprites)
         
         self.camera_sprites.update_player(self.player.sprite)
 
