@@ -62,6 +62,7 @@ class Enemy(pygame.sprite.Sprite):
         self.knockback: int = self.data['knockback']
         self.attack_cooldown = self.data['attack cooldown']
         self.leap_speed = self.data['leap speed']
+        self.coin_drops = self.data['coin drops']
 
         # Health Bar
         self.health_bar_rect = pygame.Rect(*(self.rect.midtop - Vector2(0, 10)), self.rect.width * 8 / 10, self.rect.height / 6)
@@ -75,7 +76,7 @@ class Enemy(pygame.sprite.Sprite):
 
         edited_enemy_name = '_'.join(self.enemy_name.split(' '))
 
-        self.animations = [pygame.transform.scale(image:=pygame.image.load(f'./assets/enemies/{self.enemy_name}/{edited_enemy_name}_{i}.png').convert_alpha(), (image.get_width() * self.scale_factor, image.get_height() * self.scale_factor)) for i in range(1, 5)]
+        self.animations = [pygame.transform.scale_by(pygame.image.load(f'./assets/enemies/{self.enemy_name}/{edited_enemy_name}_{i}.png').convert_alpha(), self.scale_factor) for i in range(1, 5)]
 
     def import_sounds(self):
         self.enemy_leap_sound = Sound('./assets/sounds/enemies/enemy_leap.mp3')
