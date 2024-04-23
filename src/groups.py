@@ -144,6 +144,14 @@ class InteractiveGroup(Group):
 
                         case _:
                             pass
+    
+    def update_sprites(self, player: Sprite):
+        for sprite in self.sprites():
+            match sprite.layer_name:
+                case 'Coin':
+                    sprite.move_towards_player(player.rect.center)
+    
+    
 
 
 
@@ -188,7 +196,8 @@ class ActiveGroup(Group):
                     if player.health <= 0:
                         player.health = 0
                         self.death_music.play()
-                    
+                        return True
+
                     elif not player.got_attacked:
                         player.health -= enemy_sprite.damage
                         self.player_hurt_sound.play() if player.health / player.initial_health >= 0.3 else self.player_hurt_final_sound.play()
@@ -197,3 +206,5 @@ class ActiveGroup(Group):
                     else:
                         player.delta = Vector2(enemy_sprite.player_delta)
                         player.update_direction_from_delta(inverse_facing_right=True)
+        
+        return False
