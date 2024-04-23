@@ -31,6 +31,7 @@ class Game:
         self.coin_image = pygame.transform.scale(pygame.image.load('./assets/sprite animations/coin/coin_1.png').convert_alpha(), (TILE_SIZE, TILE_SIZE))
 
         self.game_over = False
+        self.victory = False
 
     @run_once
     def play_music(self):
@@ -116,7 +117,10 @@ class Game:
 
         self.animation_sprites.animate()
 
-        self.interactive_sprites.update_collision(self.player.sprite)
+        self.victory = self.interactive_sprites.update_collision(self.player.sprite)
+
+        if self.victory:
+            self.music.stop()
 
         self.interactive_sprites.update_sprites(self.player.sprite)
 

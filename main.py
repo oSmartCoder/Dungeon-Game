@@ -31,14 +31,22 @@ class Main:
             self.menu.play_music()
             self.menu.update()
         else:
-            if not self.game.game_over:
-                self.game.play_music()
-                self.game.update()
+            if self.game.victory:
+                self.display_victory_screen()
             elif self.game.game_over:
                 self.display_game_over_screen()
+            elif not self.game.game_over:
+                self.game.play_music()
+                self.game.update()
+
+            
     
     def display_game_over_screen(self):
         display_text(self.win, 'Game Over', (WIN_X / 2, WIN_Y / 4), font_name='yoster', font_size=100)
+    
+    def display_victory_screen(self):
+        display_text(self.win, 'You Win!', (WIN_X / 2, WIN_Y / 4), font_name='yoster', font_size=100)
+
 
     def display_cursor(self):
         pos = pygame.mouse.get_pos()

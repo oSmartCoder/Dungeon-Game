@@ -111,8 +111,10 @@ class InteractiveGroup(Group):
         self.win = pygame.display.get_surface()
 
         self.coin_sound = Sound('./assets/sounds/items/coin-edit.wav')
+        self.victory_music = Sound('./assets/sounds/music/bit win.mp3')
+        self.victory_music.set_volume(0.5)
     
-    def update_collision(self, player: Sprite):
+    def update_collision(self, player: Sprite) -> True | False:
         for sprite in self.sprites():
             if player.rect.colliderect(sprite.rect):
                 if player.mask.overlap(sprite.mask, sprite.rect.topleft - Vector2(player.rect.topleft)):
@@ -140,18 +142,19 @@ class InteractiveGroup(Group):
                             pass
 
                         case 'Ladder':
-                            print('you win!')
+                            self.victory_music.play(loops=-1, fade_ms=3000)
+                            return True
 
                         case _:
                             pass
+        
+        return False
     
     def update_sprites(self, player: Sprite):
         for sprite in self.sprites():
             match sprite.layer_name:
                 case 'Coin':
                     sprite.move_towards_player(player.rect.center)
-    
-    
 
 
 
@@ -169,7 +172,7 @@ class ActiveGroup(Group):
 
         self.death_music = Sound('./assets/sounds/music/death_music.mp3')
 
-    def check_collision_between_sprites(self, camera_sprites: Group, animation_sprites: Group, interactive_sprites: Group):
+    def check_collision_between_sprites(self, camera_sprites: Group, animation_sprites: Group, interactive_sprites: Group) -> True | False:
         player = self.sprites()[0]
         enemy_sprites = self.sprites()[1:]
         
