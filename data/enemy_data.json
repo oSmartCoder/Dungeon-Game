@@ -12,7 +12,7 @@
     },
 
     "red 2": {
-        "health": 40,
+        "health": 30,
         "damage": 6,
         "attack radius": 150,
         "pursue radius": 600,
@@ -24,7 +24,7 @@
     },
 
     "red 3": {
-        "health": 80,
+        "health": 60,
         "damage": 8,
         "attack radius": 150,
         "pursue radius": 700,
@@ -36,8 +36,8 @@
     },
 
     "red 4": {
-        "health": 120,
-        "damage": 15,
+        "health": 80,
+        "damage": 12,
         "attack radius": 150,
         "pursue radius": 700,
         "attack cooldown": 3,
