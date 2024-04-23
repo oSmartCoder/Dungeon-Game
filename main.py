@@ -3,7 +3,10 @@ from pygame.locals import *
 import sys
 
 from settings import *
+from support import display_text
 from src import Game
+from src import Menu
+
 
 
 class Main:
@@ -16,18 +19,29 @@ class Main:
         self.win = pygame.display.set_mode((WIN_X, WIN_Y))
         pygame.display.set_icon(pygame.image.load('./assets/gui/icon.png'))
 
-
         # Custom cursor setup
         self.cursor = pygame.image.load('./assets/gui/cursor/white.png')
 
         self.game = Game()
+        self.menu = Menu()
+
 
     def update(self):
-        self.game.update()
+        if self.menu.in_menu:
+            self.menu.play_music()
+            self.menu.update()
+        else:
+            if not self.game.game_over:
+                self.game.play_music()
+                self.game.update()
+            elif self.game.game_over:
+                self.display_game_over_screen()
+    
+    def display_game_over_screen(self):
+        display_text(self.win, 'Game Over', (WIN_X / 2, WIN_Y / 4), font_name='yoster', font_size=100)
 
     def display_cursor(self):
         pos = pygame.mouse.get_pos()
-
         self.win.blit(self.cursor, pos)
 
     def run(self):
