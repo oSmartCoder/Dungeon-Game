@@ -3,14 +3,13 @@ from pygame.mixer import Sound
 from pytmx import TiledTileLayer
 from pytmx.util_pygame import load_pygame
 
-from random import choice
-
 from .player import Player
 from .tile import *
 from .groups import CollisionGroup, CameraGroup, AnimationGroup, InteractiveGroup, ActiveGroup
 from .enemy import Enemy
 from settings import *
 from support import display_text
+from decorators import run_once
 
 
 class Game:
@@ -29,18 +28,15 @@ class Game:
 
         self.load_level()
 
-        self.import_music()
-
         self.coin_image = pygame.transform.scale(pygame.image.load('./assets/sprite animations/coin/coin_1.png').convert_alpha(), (TILE_SIZE, TILE_SIZE))
 
-    def import_music(self):
-        self.tracks = []
+        self.game_over = False
 
-        for track in [Sound(f'./assets/sounds/music/{track_name}.mp3') for track_name in ['otherworld']]:
-            track.set_volume(0.1)
-            self.tracks.append(track)
-
-        choice(self.tracks).play(loops=-1, fade_ms=2)
+    @run_once
+    def play_music(self):
+        self.music = Sound(f'./assets/sounds/music/otherworld.mp3')
+        self.music.set_volume(0.8)
+        self.music.play(loops=-1, fade_ms=5000)
 
     def load_level(self):
         tmx_data = load_pygame('./assets/tmx/level_1.tmx')
@@ -98,9 +94,9 @@ class Game:
                     Enemy(pos, [self.camera_sprites, self.animation_sprites, self.active_sprites, self.enemy_sprites], obj.name)
                 
     def display_coin_counter(self):
-        self.win.blit(self.coin_image, self.coin_image.get_rect(center=(40, 100)).topleft)
+        self.win.blit(self.coin_image, (10, 70))
 
-        display_text(self.win, f'x{self.player.sprite.coins}', (80, 105))
+        display_text(self.win, f'x{self.player.sprite.coins}', (66, 91), position='topleft')
 
     def update(self):        
         self.collision_sprites.update_active_sprites_position(self.active_sprites, self.player.sprite)
@@ -111,13 +107,18 @@ class Game:
 
         self.camera_sprites.center_target_camera(self.player.sprite)
 
-        self.active_sprites.check_collision_between_sprites(self.camera_sprites, self.animation_sprites, self.interactive_sprites)
+        self.game_over = self.active_sprites.check_collision_between_sprites(self.camera_sprites, self.animation_sprites, self.interactive_sprites)
+        
+        if self.game_over:
+            self.music.stop()
         
         self.camera_sprites.update_player(self.player.sprite)
 
         self.animation_sprites.animate()
 
         self.interactive_sprites.update_collision(self.player.sprite)
+
+        self.interactive_sprites.update_sprites(self.player.sprite)
 
         self.display_coin_counter()
 
