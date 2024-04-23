@@ -1,10 +1,12 @@
 import pygame
+from pygame.sprite import Sprite, Group
+from pygame.math import Vector2
 
 from settings import *
 
 
-class Tile(pygame.sprite.Sprite):
-    def __init__(self, pos: tuple[int, int], surface: pygame.Surface, groups: list[pygame.sprite.Group], layer_name: str) -> None:
+class Tile(Sprite):
+    def __init__(self, pos: tuple[int, int], surface: pygame.Surface, groups: list[Group], layer_name: str) -> None:
         super().__init__(groups)
 
         self.image = surface
@@ -44,6 +46,15 @@ class Coin(Tile):
     
         self.animation_index = 0
         self.animation_speed = 0.1
+
+        self.radius = 150
+        self.vel = 4
+        # self.delta = Vector2()
+
+    def move_towards_player(self, player_center: Vector2 | tuple):
+        if Vector2(self.rect.center).distance_to(player_center) <= self.radius:
+            self.rect.center += Vector2(self.rect.center).move_towards(player_center, self.vel) - self.rect.center
+
             
 
 class Flask(Tile):
