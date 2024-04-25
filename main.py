@@ -38,8 +38,6 @@ class Main:
             elif not self.game.game_over:
                 self.game.play_music()
                 self.game.update()
-
-            
     
     def display_game_over_screen(self):
         display_text(self.win, 'Game Over', (WIN_X / 2, WIN_Y / 4), font_name='yoster', font_size=100)
