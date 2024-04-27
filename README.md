@@ -5,7 +5,7 @@ I will be updating this project from time to time, but for now, this game is sti
 
 
 ## Installation
-1. Click on the green button that says '<> Code' and in that dropdown click on 'Download ZIP'.
+1. Click on the green button that says '<> Code' and at the bottom of the dropdown click on 'Download ZIP'.
 2. Once you have downloaded the ZIP file, locate the file and make sure to extract the contents of the compressed file.
 3. Upon completion, click on the extracted file two times until you reach the inner contents of the folder.
 4. Run `main.exe`. On windows, if you are prompted with an antivirus or Microsoft Defender preventing you from running the program, you can safely disable it temporarily.
