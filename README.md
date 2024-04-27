@@ -14,4 +14,4 @@ I will be updating this project from time to time, but for now, this game is sti
 
 
 ## License
-This project is licensed under the terms of the GNU AGPL 3.0 license. See the LICENSE file.
+This project is licensed under the terms of the GNU AGPL 3.0 license. See the [LICENSE](https://github.com/oSmartCoder/Dungeon-Game?tab=AGPL-3.0-1-ov-file) file.
