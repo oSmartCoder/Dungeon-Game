@@ -3,6 +3,8 @@ from pygame.mixer import Sound
 from pytmx import TiledTileLayer
 from pytmx.util_pygame import load_pygame
 
+from random import randint as rand
+
 from .player import Player
 from .tile import *
 from .groups import CollisionGroup, CameraGroup, AnimationGroup, InteractiveGroup, ActiveGroup
