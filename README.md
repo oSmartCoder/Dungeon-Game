@@ -13,5 +13,11 @@ I will be updating this project from time to time, but for now, this game is sti
 5. Done! You should hopefully be able to run the game without any errors.
 
 
+## Gameplay Screenshots
+<div align="center">
+    <img src="https://github.com/oSmartCoder/Dungeon-Game/assets/92610222/857929de-6f62-47c6-9f9b-d44e65603857" alt="gameplay" width="600"/">
+    <img src="https://github.com/oSmartCoder/Dungeon-Game/assets/92610222/233393ec-212c-46f7-950f-f4bf492c3401" alt="gameplay" width="600"/">
+</div>
+
 ## License
 This project is licensed under the terms of the GNU AGPL 3.0 license. See the [LICENSE](https://github.com/oSmartCoder/Dungeon-Game?tab=AGPL-3.0-1-ov-file) file.
