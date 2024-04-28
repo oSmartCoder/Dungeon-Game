@@ -27,7 +27,7 @@ I will be updating this project from time to time, but for now, this game is sti
    pip install pytmx
    ```
 3. Once completed, you may now run the `main.py` file (located in the root directory)
-   - If any error occurs, ensure you have followed each of these steps correctly. Also feel free to open an issue if you think there is an error preventing you from running the program.
+   - If any error occurs, double-check if you have followed each of these steps correctly. Also, feel free to open an issue if you think there is an error preventing you from running the program.
 
 ## Gameplay Screenshots
 <div align="center">
