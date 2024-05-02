@@ -76,7 +76,6 @@ class Menu:
         if not any([text_rect.collidepoint(pos) for text_rect in options]):
             self.hover = False
 
-
     def update(self):
         self.win.blit(self.background_image, (0, 0))
         self.display_title()

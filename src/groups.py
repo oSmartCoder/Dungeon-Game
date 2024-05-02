@@ -180,7 +180,7 @@ class ActiveGroup(Group):
             if player.triggered:
                 if enemy_sprite.mask.overlap(player.particle_mask, (player.particle_rect.topleft + camera_sprites.offset - enemy_sprite.rect.topleft)):
                     if enemy_sprite.health <= 0:
-                        [Coin(enemy_sprite.rect.center + Vector2(randint(1, 30 ), randint(1, 30)), [camera_sprites, animation_sprites, interactive_sprites], 'Coin') for _ in range(enemy_sprite.coin_drops)]
+                        [Coin(enemy_sprite.rect.center + Vector2(randint(1, 30), randint(1, 30)), [camera_sprites, animation_sprites, interactive_sprites], 'Coin') for _ in range(enemy_sprite.coin_drops)]
                         enemy_sprite.kill()
                         self.enemy_die_sound.play()
 

@@ -54,7 +54,6 @@ class Coin(Tile):
     def move_towards_player(self, player_center: Vector2 | tuple):
         if Vector2(self.rect.center).distance_to(player_center) <= self.radius:
             self.rect.center += Vector2(self.rect.center).move_towards(player_center, self.vel) - self.rect.center
-
             
 
 class Flask(Tile):

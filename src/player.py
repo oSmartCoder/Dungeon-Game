@@ -111,8 +111,6 @@ class Player(pygame.sprite.Sprite):
         self.player_roll_sound = Sound('./assets/sounds/player/player_roll.wav')
         # self.footsteps_sound = Sound('./assets/sounds/player/footsteps.wav')
 
-
-
     def import_data(self):
         # Import weapon data
         with open('./data/weapon_data.json') as rf:
@@ -198,7 +196,6 @@ class Player(pygame.sprite.Sprite):
             self.direction.y = -1
         else:
             self.direction.y = 0
-
         
         if any((keys[self.controls['a']], keys[self.controls['d']])) and not keys[self.controls['w']]:
             self.status = 'run'
@@ -207,7 +204,6 @@ class Player(pygame.sprite.Sprite):
         # Normalise vector movement (so that diagonal movement won't go 41% faster)
         if self.direction.magnitude() > 0:
             self.direction = self.direction.normalize()
-
 
         self.delta += self.direction * self.vel         
 
