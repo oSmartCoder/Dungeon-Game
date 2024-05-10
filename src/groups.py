@@ -157,7 +157,6 @@ class InteractiveGroup(Group):
                     sprite.move_towards_player(player.rect.center)
 
 
-
 class ActiveGroup(Group):
     def __init__(self):
         super().__init__()

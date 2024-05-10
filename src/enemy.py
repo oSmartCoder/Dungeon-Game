@@ -180,7 +180,7 @@ class Enemy(pygame.sprite.Sprite):
                 x3 = x1 - d
             
             else:
-                raise ValueError('y2 - y1 should not be zero.')
+                raise ValueError('x2 - x1 should not be zero.')
 
         else:
             m = (y2 - y1) / (x2 - x1)
