@@ -29,6 +29,9 @@ I will be updating this project from time to time, but for now, this game is sti
 3. Once completed, you may now run the `main.py` file (located in the root directory)
    - If any error occurs, double-check if you have followed each of these steps correctly. Also, feel free to open an issue if you think there is an error preventing you from running the program.
 
+## Controls
+`WASD` movement, and `LEFT CLICK` to attack 
+
 ## Gameplay Screenshots
 <div align="center">
     <img src="https://github.com/oSmartCoder/Dungeon-Game/assets/92610222/857929de-6f62-47c6-9f9b-d44e65603857" alt="gameplay" width="600"/">
